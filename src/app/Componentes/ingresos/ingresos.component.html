@@ -15,7 +15,7 @@
 <div>
   <div id="container-grafica">
     <img src="https://docs.aws.amazon.com/es_es/quicksight/latest/user/images/example-visual-line-chart.png" alt="" id="grafica">
-    <button type="button" class="btn btn-secondary btn-lg" id="boton-ingresar-reporte" (click)="openModal1(template1)">Ingresar Reporte</button>
+    <button type="button" class="btn btn-secondary btn-lg" id="boton-ingresar-reporte" (click)="openModal(template1)">Ingresar Reporte</button>
   </div>
   <hr>
 </div>
@@ -30,10 +30,10 @@
           <div class="d-flex justify-content-center">
             <div class="input-group mb-3">
               <label class="input-group-text" for="customFile">{{ selectedFileName ? selectedFileName : 'Seleccionar Archivo' }}</label>
-              <input type="file" class="form-control" id="customFile" accept=".xlsx" #fileInput (change)="onFileSelected($event)" style="display: none;">
+              <input type="file" class="form-control" id="customFile" accept=".xlsx" required (change)="onFileSelected($event)" style="display: none;">
             </div>
             <div class="input-group mb-3">
-              <input type="date" class="form-control" id="customDate">
+              <input type="date" class="form-control" id="customDate" required>
             </div>
           </div>
           <div class="modal-footer">
@@ -133,7 +133,7 @@
       <label for="fechaFin">Fecha Fin</label>
     </div>
     <div class="col-3">
-      <button type="button" class="btn btn-secondary btn-lg btn-block" id="boton-filtrar" [disabled]="miFormulario.invalid">Filtrar Registros</button>
+      <button type="button" class="btn btn-secondary btn-lg btn-block" id="boton-filtrar" [disabled]="miFormulario.invalid" (click)="filtrarRegistros()">Filtrar Registros</button>
       <div *ngIf="miFormulario.hasError('dateRangeInvalid')">
         El rango de fechas no es válido.
       </div>
@@ -142,8 +142,72 @@
 </div>
 </form>
 
+<div class="table-container">
+  <table class="custom-table" *ngIf="reportes">
+    <thead>
+      <tr>
+        <th scope="col">Fecha</th>
+        <th scope="col">Ingresos</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let reporte of reportes">
+        <td>{{ reporte.fecha | date: 'shortDate' }}</td>
+        <td class="consultar-cell" (click)="openModal(detalleReporteModal)">
+          Consultar
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 
+<ng-template #detalleReporteModal>
+  <div class="modal-header">
+    <h1 class="modal-title fs-5">Ingresos</h1>
+  </div>
+  <div class="modal-body">
+    <!-- Tabla de Datos Mensuales -->
+    <h2>Datos Mensuales</h2>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" [(ngModel)]="ocultarDatosMensuales">
+      <label class="form-check-label">Ocultar Datos Mensuales</label>
+    </div>
+    <table class="table" *ngIf="!ocultarDatosMensuales">
+      <thead>
+        <tr>
+          <th>Concepto</th>
+          <th>Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Inscripciones</td>
+          <td>{{ reporteMensual.DatosMensuales.inscripciones_total_mes }}</td>
+        </tr>
+        <tr>
+          <td>Venta de Productos</td>
+          <td>{{ reporteMensual.DatosMensuales.ventaProductos_total_mes }}</td>
+        </tr>
+        <tr>
+          <td>Subvenciones</td>
+          <td>{{ reporteMensual.DatosMensuales.subvenciones_total_mes }}</td>
+        </tr>
+        <tr>
+          <td>Auxiliares</td>
+          <td>{{ reporteMensual.DatosMensuales.auxiliares_total_mes }}</td>
+        </tr>
+        <tr>
+          <td>Titulos</td>
+          <td>{{ reporteMensual.DatosMensuales.titulos_total_mes}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="closeModal()" class="btn btn-secondary">Cerrar</button>
+  </div>
+</ng-template>
 
 
 

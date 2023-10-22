@@ -19,9 +19,16 @@ export class IngresosComponent implements OnInit{
   ocultarDatosMensuales = false;
   ocultarDatosDiarios = true;
   miFormulario: FormGroup;
+  reportes: any;
+  reporteSeleccionado: any;
   private socket: Socket;
+  
 
-  constructor(private ingresoService:IngresoService,private modalService: BsModalService, private fb: FormBuilder) {
+  constructor(
+    private ingresoService:IngresoService,
+    private modalService: BsModalService, 
+    private fb: FormBuilder) 
+    {
     this.miFormulario = this.fb.group({
       fechaInicio: [null, Validators.required],
       fechaFin: [null, Validators.required],
@@ -36,21 +43,6 @@ export class IngresosComponent implements OnInit{
     });
   }
 
-  dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
-    const fechaInicioControl = group.get('fechaInicio');
-    const fechaFinControl = group.get('fechaFin');
-
-    if (fechaInicioControl && fechaFinControl) {
-      const fechaInicio = fechaInicioControl.value;
-      const fechaFin = fechaFinControl.value;
-
-      if (fechaInicio && fechaFin && fechaInicio > fechaFin) {
-        return { dateRangeInvalid: true };
-      }
-    }
-
-    return null;
-  }
 
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
@@ -62,7 +54,7 @@ export class IngresosComponent implements OnInit{
     }
   }
 
-  onSubmit(event: Event,template2: TemplateRef<any>) {
+  onSubmit(event: Event,template: TemplateRef<any>) {
     event.preventDefault();
     if (this.selectedFile) {
       const formData = new FormData();
@@ -83,7 +75,7 @@ export class IngresosComponent implements OnInit{
             this.fechaMensual = (document.getElementById('customDate') as HTMLInputElement).value;
             this.closeModal()
             setTimeout(() => { 
-              this.openModal2(template2);
+              this.openModal(template);
             },500);
           },
           err=> {
@@ -97,19 +89,13 @@ export class IngresosComponent implements OnInit{
     }
   }
 
-  openModal1(template: TemplateRef<any>) {
+  openModal(template: TemplateRef<any>) {
     this.bsModalRef = this.modalService.show(template,{
       backdrop: 'static',
       keyboard: false
     });
   }
 
-  openModal2(template2: TemplateRef<any>) {
-    this.bsModalRef = this.modalService.show(template2, {
-      backdrop: 'static',
-      keyboard: false
-    }); // Abre el segundo modal
-  }
   
   closeModal() {
     this.clearFileInput(); 
@@ -149,6 +135,37 @@ export class IngresosComponent implements OnInit{
       }
     );
   } 
+
+  filtrarRegistros() {
+    const fechaInicio = this.miFormulario?.get('fechaInicio')?.value;
+    const fechaFin = this.miFormulario.get('fechaFin')?.value;
+
+    this.ingresoService.obtenerReportesPorMes(fechaInicio, fechaFin).subscribe(
+      data => {
+        this.reportes = data;
+      },
+      error => {
+        console.error('Error obteniendo los reportes:', error);
+      }
+    );
+  }
+
+  dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
+    const fechaInicioControl = group.get('fechaInicio');
+    const fechaFinControl = group.get('fechaFin');
+
+    if (fechaInicioControl && fechaFinControl) {
+      const fechaInicio = fechaInicioControl.value;
+      const fechaFin = fechaFinControl.value;
+
+      if (fechaInicio && fechaFin && fechaInicio > fechaFin) {
+        return { dateRangeInvalid: true };
+      }
+    }
+
+    return null;
+  }
+
 
   private isSocketAvailable(): boolean {
     return this.socket.connected;
