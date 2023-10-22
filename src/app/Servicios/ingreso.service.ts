@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, retry } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +21,14 @@ export class IngresoService {
       reporteMensual: dataMensual, 
       fechaReporte: fecha 
     });
+  }
+
+  public obtenerReportesPorMes(fechaInicial:string, fechaFinal: string):Observable<any> {
+    return this.httpClient.get<any>(this.clienteURL+ `reporte-mensual/${fechaInicial}/${fechaFinal}`)
+  }
+
+  public obtenerReportesPorDias(fechaInicial:string, fechaFinal: string):Observable<any> {
+    return this.httpClient.get<any>(this.clienteURL+ `reporte-diario/${fechaInicial}/${fechaFinal}`)
   }
 
 }
