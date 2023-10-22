@@ -1,0 +1,18 @@
+.container-grafica{
+    display: flex;
+    flex-direction: column; /* Alinear elementos verticalmente */
+    justify-content: center;
+    align-items: center;
+    height: 70vh; 
+}
+
+.grafica{
+    border-color: black;
+    border-style: solid;
+    height: 300px;
+    width: 600px;
+}
+
+.btn-reporte {
+    margin-top: 20px;
+}

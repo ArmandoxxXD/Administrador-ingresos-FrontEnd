@@ -1,0 +1,13 @@
+<div class="content col-12">
+    <ul class="nav nav-tabs justify-content-center">
+        <li class="nav-item col-4">
+            <a class="btn btn-outline-primary w-100 btn-lg" [class.active]="getPath() === '/home'" routerLink="/home">Administracion</a>
+        </li>
+        <li class="nav-item col-4">
+            <a class="btn btn-outline-primary w-100 btn-lg" [class.active]="getPath() === '/ingresos'" routerLink="/ingresos">Ingresos</a>
+        </li>
+        <li class="nav-item col-4">
+            <a class="btn btn-outline-primary w-100 btn-lg" [class.active]="getPath() === '/gastos'" routerLink="/gastos">Gastos</a>
+        </li>
+    </ul>
+</div>
