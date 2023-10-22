@@ -72,15 +72,15 @@
       <tbody>
         <tr>
           <td>Inscripciones</td>
-          <td>{{ reporteMensual.DatosMensuales.Inscripciones_total_mes }}</td>
+          <td>{{ reporteMensual.DatosMensuales.inscripciones_total_mes }}</td>
         </tr>
         <tr>
-          <td>Otros</td>
-          <td>{{ reporteMensual.DatosMensuales.Otros_total_mes }}</td>
+          <td>Venta de Productos</td>
+          <td>{{ reporteMensual.DatosMensuales.ventaProductos_total_mes }}</td>
         </tr>
         <tr>
           <td>Subvenciones</td>
-          <td>{{ reporteMensual.DatosMensuales.Subvenciones_total_mes }}</td>
+          <td>{{ reporteMensual.DatosMensuales.subvenciones_total_mes }}</td>
         </tr>
         <tr>
           <td>Auxiliares</td>
@@ -117,7 +117,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary"  (click)="closeModal()">Cancelar</button>
-    <button type="submit" class="btn btn-primary">Cargar Información</button>
+    <button type="submit" class="btn btn-primary" (click)="insertarReporteMensual()" >Cargar Información</button>
   </div>
 </ng-template>
 

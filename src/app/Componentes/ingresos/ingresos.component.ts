@@ -15,6 +15,7 @@ export class IngresosComponent implements OnInit{
   bsModalRef: BsModalRef | undefined;
   selectedFileName: string | undefined;
   reporteMensual: any;
+  fechaMensual: any;
   ocultarDatosMensuales = false;
   ocultarDatosDiarios = true;
   miFormulario: FormGroup;
@@ -79,6 +80,7 @@ export class IngresosComponent implements OnInit{
               window.alert(data.message);
             }
             this.reporteMensual=data.data
+            this.fechaMensual = (document.getElementById('customDate') as HTMLInputElement).value;
             this.closeModal()
             setTimeout(() => { 
               this.openModal2(template2);
@@ -119,6 +121,34 @@ export class IngresosComponent implements OnInit{
       this.selectedFile = undefined; // Limpia la variable selectedFile
       this.selectedFileName = undefined; // Limpia el nombre del archivo seleccionado
   }
+
+  insertarReporteMensual() {
+    const fecha = this.fechaMensual
+    // Extrae la información diaria y mensual desde el objeto de reporte
+    const dataDiaria = {
+      fechas: this.reporteMensual.Diario.datosDelRangoDias,
+      totales: this.reporteMensual.Diario.datosDelRangoTotalDia
+    };
+    const dataMensual = {
+      auxiliares_total_mes: this.reporteMensual.DatosMensuales.auxiliares_total_mes,
+      inscripciones_total_mes:this. reporteMensual.DatosMensuales.inscripciones_total_mes,
+      subvenciones_total_mes: this.reporteMensual.DatosMensuales.subvenciones_total_mes,
+      titulos_total_mes: this.reporteMensual.DatosMensuales.titulos_total_mes,
+      ventaProductos_total_mes: this.reporteMensual.DatosMensuales.ventaProductos_total_mes
+    };
+
+    console.log(dataMensual, dataDiaria, fecha)
+    this.ingresoService.enviarReporte(dataDiaria, dataMensual, fecha).subscribe(
+      response => {
+        console.log('Información enviada con éxito', response);
+        this.closeModal(); 
+      },
+      error => {
+        console.error('Error al enviar la información', error);
+        this.closeModal(); 
+      }
+    );
+  } 
 
   private isSocketAvailable(): boolean {
     return this.socket.connected;

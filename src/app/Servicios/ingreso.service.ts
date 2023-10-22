@@ -14,6 +14,14 @@ export class IngresoService {
   public CargarReporteExel(reporte:FormData):Observable<any>{
     return this.httpClient.post<any>(this.clienteURL+'cargar-excel', reporte);
   }
+  
+  public enviarReporte(dataDiaria: any, dataMensual: any, fecha: string): Observable<any> {
+    return this.httpClient.post<any>(this.clienteURL + 'cargar-ingreso', { 
+      reporteDiario: dataDiaria,
+      reporteMensual: dataMensual, 
+      fechaReporte: fecha 
+    });
+  }
 
 }
 
