@@ -23,12 +23,34 @@ export class IngresoService {
     });
   }
 
+  public validarMesAño(fecha: string): Observable<any> {
+    return this.httpClient.post<any>(this.clienteURL + 'validar-fecha', { 
+      fecha: fecha 
+    });
+  }
+
   public obtenerReportesPorMes(fechaInicial:string, fechaFinal: string):Observable<any> {
     return this.httpClient.get<any>(this.clienteURL+ `reporte-mensual/${fechaInicial}/${fechaFinal}`)
   }
 
   public obtenerReportesPorDias(fechaInicial:string, fechaFinal: string):Observable<any> {
     return this.httpClient.get<any>(this.clienteURL+ `reporte-diario/${fechaInicial}/${fechaFinal}`)
+  }
+
+  public obtenerReporteMensualPorID(id:number):Observable<any> {
+    return this.httpClient.get<any>(this.clienteURL+ `reporte-mensual-porId/${id}`)
+  }
+
+  public obtenerReporteDiarioPorId(id:number):Observable<any> {
+    return this.httpClient.get<any>(this.clienteURL+ `reporte-diario-porId/${id}`)
+  }
+
+  public eliminarReporteDiarioPorId(id:number):Observable<any> {
+    return this.httpClient.delete<any>(this.clienteURL+ `eliminar-reporte-mensual-porId/${id}`)
+  }
+
+  public obtenerIngresosTotales():Observable<any> {
+    return this.httpClient.get<any>(this.clienteURL+ `suma-total-mes-ingresos`)
   }
 
 }
