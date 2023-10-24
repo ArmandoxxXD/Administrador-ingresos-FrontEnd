@@ -1,14 +1,18 @@
-import { Component, ElementRef, ViewChild, TemplateRef, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, NgZone, TemplateRef, OnInit } from '@angular/core';
 import { IngresoService } from 'src/app/Servicios/ingreso.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
 import { io,Socket } from 'socket.io-client';
 import { HomeService } from 'src/app/Servicios/home.service';
+
+import { createChart } from 'lightweight-charts';
+
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
   styleUrls: ['./ingresos.component.css']
 })
+
 export class IngresosComponent {
   @ViewChild('fileInput') fileInput: ElementRef | undefined;
   selectedFile: File | undefined;
@@ -30,13 +34,15 @@ export class IngresosComponent {
   currentPage = 1;
   itemsPerPage = 10;
   fechavalid: boolean = false;
-  
+  private chart: any; // Declarar la variable para el gráfico
+  private lineSeries: any;
 
   constructor(
     private ingresoService:IngresoService,
     private homeService:HomeService,
     private modalService: BsModalService, 
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private zone: NgZone
     ) 
     {
     this.miFormulario = this.fb.group({
@@ -48,6 +54,10 @@ export class IngresosComponent {
       fechaRegistro: [null, Validators.required],
     });
     this.socket = io('http://localhost:2000');
+
+
+
+
   }
 
   onFileSelected(event: any) {
@@ -169,6 +179,14 @@ export class IngresosComponent {
         data => {
           this.reportes = data;
           console.log(this.reportes);
+
+      
+          this.reportes.forEach((dato: any) => {
+            this.lineSeries.update(
+              { time: this.filtrarFecha(dato.fecha) , value: dato.data.total_mes },
+              );
+          });
+
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
@@ -257,6 +275,37 @@ export class IngresosComponent {
 
   private isSocketAvailable(): boolean {
     return this.socket.connected;
+  }
+
+  ngOnInit(): void {
+    this.chart = createChart('chart-container', {
+      width: 800, // Personaliza el ancho
+      height: 400, // Personaliza la altura
+    });
+
+    this.lineSeries = this.chart.addLineSeries();
+
+    const datos = [
+      { time: '2023-01-01', value: 0 },
+    ];
+
+    datos.forEach((dato: any) => {
+      this.lineSeries.update(
+        dato
+        );
+    });
+    
+  }
+
+  filtrarFecha(fechaOriginal: any): String {
+    const fecha = new Date(fechaOriginal); // Convierte la fecha original en un objeto Date
+    const year = fecha.getFullYear(); // Obtiene el año
+    const month = (fecha.getMonth() + 1).toString().padStart(2, '0'); // Obtiene el mes y lo formatea
+    const day = fecha.getDate().toString().padStart(2, '0'); // Obtiene el día y lo formatea
+  
+    const fechaFormateada = `${year}-${month}-${day}`; // Crea la fecha formateada
+  
+    return fechaFormateada;
   }
   
 }

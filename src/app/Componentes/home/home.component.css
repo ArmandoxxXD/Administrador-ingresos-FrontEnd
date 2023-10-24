@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.home__body {
+    margin: 7em;
+    width: 100vw;
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home__grafica {
+    width: 60vw;
+    height: 70vh;
+}
+
+.datos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.datos__grupo {
+    width: 20%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}

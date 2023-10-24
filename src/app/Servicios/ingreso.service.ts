@@ -53,5 +53,6 @@ export class IngresoService {
     return this.httpClient.get<any>(this.clienteURL+ `suma-total-mes-ingresos`)
   }
 
+
 }
 

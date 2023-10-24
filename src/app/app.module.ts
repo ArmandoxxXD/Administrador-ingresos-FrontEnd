@@ -9,6 +9,7 @@ import { HomeComponent } from './Componentes/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { HeaderComponent } from './Componentes/header/header.component';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 @NgModule({
   declarations: [
@@ -19,12 +20,13 @@ import { HeaderComponent } from './Componentes/header/header.component';
     HeaderComponent
   ],
   imports: [
+    NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
     ModalModule.forRoot(),
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
