@@ -24,4 +24,19 @@ export class HeaderComponent implements OnInit{
   private setPath() {
     this.path = this.router.url;
   }
+
+  TemaOscuro = () => {
+    document.querySelector('body')?.setAttribute("data-bs-theme", "dark");
+    document.querySelector('#btnCambiarTema')?.setAttribute("data-bs-theme", "dark");
+  }
+
+  TemaClaro = () => {
+    document.querySelector('body')?.setAttribute("data-bs-theme", "light");
+    document.querySelector('#btnCambiarTema')?.setAttribute("data-bs-theme", "light");
+  }
+
+  CambiarTema = () => {
+    document.querySelector('body')?.getAttribute("data-bs-theme") === 'light' ? this.TemaOscuro() :this.TemaClaro();
+  }
+    
 }
