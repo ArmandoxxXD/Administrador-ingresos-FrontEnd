@@ -31,6 +31,7 @@ export class GastosComponent {
   currentPage = 1;
   itemsPerPage = 10;
   fechavalid: boolean = false;
+  esModoOscuro:boolean = false;
 
   constructor(
     private gatosService:GastoService,

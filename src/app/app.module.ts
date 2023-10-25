@@ -11,6 +11,10 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { HeaderComponent } from './Componentes/header/header.component';
 import { NgxEchartsModule } from 'ngx-echarts';
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,6 +31,9 @@ import { NgxEchartsModule } from 'ngx-echarts';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
+    BrowserAnimationsModule, // required animations module
+    ToastrModule.forRoot(), // ToastrModule added, Alertas de exepciones
+    SweetAlert2Module.forRoot(), //Alertas de confirmacion
   ],
   providers: [],
   bootstrap: [AppComponent]

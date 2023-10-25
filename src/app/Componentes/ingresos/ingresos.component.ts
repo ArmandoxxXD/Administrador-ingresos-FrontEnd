@@ -4,9 +4,9 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
 import { io,Socket } from 'socket.io-client';
 import { HomeService } from 'src/app/Servicios/home.service';
-
 import { createChart } from 'lightweight-charts';
-
+import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
@@ -36,14 +36,15 @@ export class IngresosComponent {
   fechavalid: boolean = false;
   private chart: any; // Declarar la variable para el gráfico
   private lineSeries: any;
-  esModoOscuro=  this.homeService.getModo();
+  esModoOscuro:boolean = false;
 
   constructor(
     private ingresoService:IngresoService,
     private homeService:HomeService,
     private modalService: BsModalService, 
     private fb: FormBuilder,
-    private zone: NgZone
+    private zone: NgZone,
+    private toast: ToastrService
     ) 
     {
     this.miFormulario = this.fb.group({
@@ -55,7 +56,7 @@ export class IngresosComponent {
       fechaRegistro: [null, Validators.required],
     });
     this.socket = io('http://localhost:2000');
-   
+
   }
 
   onFileSelected(event: any) {
@@ -99,7 +100,7 @@ export class IngresosComponent {
               this.socket.emit('excel-procesado', data.message);
             } else {
               // El servicio Socket.io no está disponible, maneja el mensaje local
-              window.alert(data.message);
+              this.toast.success(data.message,'OK',{timeOut:3000});
             }
             this.reporteMensual=data.data
             this.fechaMensual = (document.getElementById('customDate') as HTMLInputElement).value;
@@ -254,22 +255,39 @@ export class IngresosComponent {
   }
 
   eliminarReporteMensual(id: number){ 
-    this.ingresoService.eliminarReporteDiarioPorId(id).subscribe(
-      async data => {
-        if (this.isSocketAvailable()) {
-          // El servicio Socket.io está disponible, envía el mensaje global
-          this.socket.emit('reporte-eliminado', data);
-          this.homeService.notifyUpdate(true); 
-        } else {
-          // El servicio Socket.io no está disponible, maneja el mensaje local
-          window.alert(data);
+    Swal.fire({
+      title: '¿Estas Seguro?',
+      text: 'No podras desaser la acción',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancelar'
+    }).then((result)=>{
+        if(result.value){
+          this.ingresoService.eliminarReporteDiarioPorId(id).subscribe(
+            async data => {
+              if (this.isSocketAvailable()) {
+                // El servicio Socket.io está disponible, envía el mensaje global
+                this.socket.emit('reporte-eliminado', data);
+                this.homeService.notifyUpdate(true); 
+              } else {
+                // El servicio Socket.io no está disponible, maneja el mensaje local
+                this.toast.success(data,'OK',{timeOut:3000});
+              }
+              this.filtrarRegistros()
+            },
+            error => {
+              console.error('Error obteniendo los reportes:', error);
+            }
+          )
+        }else if(result.dismiss===Swal.DismissReason.cancel){
+          Swal.fire(
+            'Cancelado',
+            'Ingreso no eliminado',
+            'error'
+          )
         }
-        this.filtrarRegistros()
-      },
-      error => {
-        console.error('Error obteniendo los reportes:', error);
-      }
-    )
+      })
   }
 
   private isSocketAvailable(): boolean {
@@ -277,6 +295,11 @@ export class IngresosComponent {
   }
 
   ngOnInit(): void {
+
+    this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
+      this.esModoOscuro = modoOscuro;
+    });
+
     this.chart = createChart('chart-container', {
       width: 800, // Personaliza el ancho
       height: 400, // Personaliza la altura

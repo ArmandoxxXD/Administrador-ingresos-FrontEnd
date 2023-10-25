@@ -15,7 +15,7 @@ export class HomeComponent implements OnInit {
   totalIngreso: number = 0;
   totalGastos: number = 0;
   Diferencias: number = 0;
-
+  esModoOscuro:boolean = false;
 
   constructor
   (
@@ -28,6 +28,11 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    
+    this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
+      this.esModoOscuro = modoOscuro;
+    });
+
     this.getTotales();
 
     this.homeService.currentUpdate.subscribe(updated => {

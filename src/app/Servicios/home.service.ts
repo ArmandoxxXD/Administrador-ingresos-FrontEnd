@@ -9,20 +9,15 @@ export class HomeService {
   private updateSource = new BehaviorSubject<boolean>(false); // inicialmente falso
   currentUpdate = this.updateSource.asObservable();
 
+  private esModoOscuroSource = new BehaviorSubject<boolean>(false); // inicialmente falso
+  esModoOscuro$ = this.esModoOscuroSource.asObservable();
+
   notifyUpdate(status: boolean) {
     this.updateSource.next(status);
   }
 
-  isModoOscuro():boolean{
-    return this.esModoOscuro=true;
-  }
-
-  isModoClaro(){
-    return this.esModoOscuro=false;
-  }
-
-  getModo():boolean{
-    return this.esModoOscuro
+  setModoOscuro(status: boolean) {
+    this.esModoOscuroSource.next(status);
   }
 
   constructor() { }
