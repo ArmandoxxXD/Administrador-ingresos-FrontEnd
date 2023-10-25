@@ -16,7 +16,7 @@ export class IngresoService {
   }
   
   public enviarReporte(dataDiaria: any, dataMensual: any, fecha: string): Observable<any> {
-    return this.httpClient.post<any>(this.clienteURL + 'cargar-ingreso', { 
+    return this.httpClient.post<any>(this.clienteURL + 'cargar-registro', { 
       reporteDiario: dataDiaria,
       reporteMensual: dataMensual, 
       fechaReporte: fecha 
@@ -50,7 +50,7 @@ export class IngresoService {
   }
 
   public obtenerIngresosTotales():Observable<any> {
-    return this.httpClient.get<any>(this.clienteURL+ `suma-total-mes-ingresos`)
+    return this.httpClient.get<any>(this.clienteURL+ `suma-total-mes`)
   }
 
 

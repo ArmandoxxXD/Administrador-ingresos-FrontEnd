@@ -256,7 +256,7 @@ export class IngresosComponent {
 
   eliminarReporteMensual(id: number){ 
     this.ingresoService.eliminarReporteDiarioPorId(id).subscribe(
-      data => {
+      async data => {
         if (this.isSocketAvailable()) {
           // El servicio Socket.io está disponible, envía el mensaje global
           this.socket.emit('reporte-eliminado', data);
@@ -265,7 +265,7 @@ export class IngresosComponent {
           // El servicio Socket.io no está disponible, maneja el mensaje local
           window.alert(data);
         }
-       this. filtrarRegistros()
+      await this. filtrarRegistros()
       },
       error => {
         console.error('Error obteniendo los reportes:', error);
