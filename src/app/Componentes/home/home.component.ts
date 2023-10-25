@@ -13,7 +13,7 @@ import * as echarts from 'echarts';
 export class HomeComponent implements OnInit {
 
   totalIngreso: number = 0;
-  totalGastos: number = 15600;
+  totalGastos: number = 0;
   Diferencias: number = 0;
 
 

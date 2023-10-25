@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { io,Socket } from 'socket.io-client';
+import { HomeService } from './Servicios/home.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -9,7 +10,7 @@ export class AppComponent implements OnInit{
   title = 'FrontEnd';
   private socket: Socket;
   
-  constructor( )
+  constructor(private homeServices:HomeService )
   {
     this.socket = io('http://localhost:2000');
   }
@@ -27,5 +28,22 @@ export class AppComponent implements OnInit{
       window.alert(mensagge.message+' '+formattedDate);
     });
     
+  }
+
+  TemaOscuro() {
+    document.querySelector('body')?.setAttribute("data-bs-theme", "dark");
+    document.querySelector('#icon')?.setAttribute("class", "fa-solid fa-sun");
+    this.homeServices.isModoOscuro();
+    console.log(this.homeServices.isModoOscuro())
+  }
+
+  TemaClaro() {
+    document.querySelector('body')?.setAttribute("data-bs-theme", "light");
+    document.querySelector('#icon')?.setAttribute("class", "fa-solid fa-moon");
+    this.homeServices.isModoClaro();
+  }
+
+  CambiarTema() {
+    document.querySelector('body')?.getAttribute("data-bs-theme") === 'light' ? this.TemaOscuro() :this.TemaClaro();
   }
 }

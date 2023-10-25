@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, NgZone, TemplateRef, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, NgZone, TemplateRef, OnInit,OnChanges } from '@angular/core';
 import { IngresoService } from 'src/app/Servicios/ingreso.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
@@ -36,6 +36,7 @@ export class IngresosComponent {
   fechavalid: boolean = false;
   private chart: any; // Declarar la variable para el gráfico
   private lineSeries: any;
+  esModoOscuro=  this.homeService.getModo();
 
   constructor(
     private ingresoService:IngresoService,
@@ -54,10 +55,7 @@ export class IngresosComponent {
       fechaRegistro: [null, Validators.required],
     });
     this.socket = io('http://localhost:2000');
-
-
-
-
+   
   }
 
   onFileSelected(event: any) {
@@ -126,6 +124,7 @@ export class IngresosComponent {
       backdrop: 'static',
       keyboard: false
     });
+    console.log(this.esModoOscuro)
   }
 
   
@@ -265,7 +264,7 @@ export class IngresosComponent {
           // El servicio Socket.io no está disponible, maneja el mensaje local
           window.alert(data);
         }
-      await this. filtrarRegistros()
+        this.filtrarRegistros()
       },
       error => {
         console.error('Error obteniendo los reportes:', error);
@@ -294,7 +293,7 @@ export class IngresosComponent {
         dato
         );
     });
-    
+    console.log(this.esModoOscuro)
   }
 
   filtrarFecha(fechaOriginal: any): String {
