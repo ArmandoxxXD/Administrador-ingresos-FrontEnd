@@ -1,3 +1,8 @@
+.grafica-ingresos {
+    width: 60vw;
+    height: 55vh;
+}
+
 #container-grafica{
     display: flex;
     flex-direction: column; /* Alinear elementos verticalmente */
@@ -12,6 +17,7 @@
     height: 300px;
     width: 600px;
 }
+
 
 #boton-ingresar-reporte{
     margin-top: 20px;

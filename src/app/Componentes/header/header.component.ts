@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HomeService } from 'src/app/Servicios/home.service';
 
 @Component({
   selector: 'app-header',
@@ -9,7 +10,7 @@ import { Router } from '@angular/router';
 export class HeaderComponent implements OnInit{
   private path = 'home';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private homeServices: HomeService ) {}
 
   ngOnInit(): void {
     this.router.events.subscribe((date: any) => {
@@ -24,5 +25,6 @@ export class HeaderComponent implements OnInit{
   private setPath() {
     this.path = this.router.url;
   }
+
     
 }

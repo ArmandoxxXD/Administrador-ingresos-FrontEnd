@@ -1,12 +1,13 @@
 import { Component, ElementRef, ViewChild, NgZone, TemplateRef, OnInit,OnChanges } from '@angular/core';
 import { IngresoService } from 'src/app/Servicios/ingreso.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { FormBuilder, FormGroup, Validators  } from '@angular/forms';
-import { io,Socket } from 'socket.io-client';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { io, Socket } from 'socket.io-client';
 import { HomeService } from 'src/app/Servicios/home.service';
-import { createChart } from 'lightweight-charts';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
+import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
+
 @Component({
   selector: 'app-ingresos',
   templateUrl: './ingresos.component.html',
@@ -21,37 +22,40 @@ export class IngresosComponent {
   selectedFileName: string | undefined;
   reporteMensual: any;
   fechaMensual: any;
-  ocultarDatosMensuales:boolean = false;
-  ocultarDatosDiarios:boolean = true;
+  ocultarDatosMensuales: boolean = false;
+  ocultarDatosDiarios: boolean = true;
   miFormulario: FormGroup;
   miFormulario2: FormGroup;
   reportes: any;
   reporte: any;
-  switchDiario: boolean =false;
+  switchDiario: boolean = false;
   IngresosDiarios: any;
   reporteSeleccionado: any;
   private socket: Socket;
   currentPage = 1;
   itemsPerPage = 10;
   fechavalid: boolean = false;
+
+  // Variables Grafica
   private chart: any; // Declarar la variable para el gráfico
   private lineSeries: any;
   esModoOscuro:boolean = false;
+  private areaSeries: any;
+
 
   constructor(
-    private ingresoService:IngresoService,
-    private homeService:HomeService,
-    private modalService: BsModalService, 
+    private ingresoService: IngresoService,
+    private homeService: HomeService,
+    private modalService: BsModalService,
     private fb: FormBuilder,
     private zone: NgZone,
     private toast: ToastrService
-    ) 
-    {
+  ) {
     this.miFormulario = this.fb.group({
       fechaInicio: [null, Validators.required],
       fechaFin: [null, Validators.required],
     }, { validators: this.dateRangeValidator });
-    this.miFormulario2= this.fb.group({
+    this.miFormulario2 = this.fb.group({
       archivo: [null, Validators.required],
       fechaRegistro: [null, Validators.required],
     });
@@ -65,16 +69,16 @@ export class IngresosComponent {
     if (this.selectedFile) {
       this.selectedFileName = this.selectedFile.name;
     } else {
-      this.selectedFileName = undefined; 
+      this.selectedFileName = undefined;
     }
   }
 
-  validarFecha(fecha: string) {  
+  validarFecha(fecha: string) {
     this.ingresoService.validarMesAño(fecha).subscribe(
       response => {
-        if (response.disponible === true){
+        if (response.disponible === true) {
           this.fechavalid = true;
-        }else {
+        } else {
           this.fechavalid = false;
           window.alert(response.message)
         }
@@ -85,7 +89,7 @@ export class IngresosComponent {
     )
   }
 
-  onSubmit(event: Event,template: TemplateRef<any>) {
+  onSubmit(event: Event, template: TemplateRef<any>) {
     event.preventDefault();
     if (this.selectedFile) {
       const formData = new FormData();
@@ -102,14 +106,14 @@ export class IngresosComponent {
               // El servicio Socket.io no está disponible, maneja el mensaje local
               this.toast.success(data.message,'OK',{timeOut:3000});
             }
-            this.reporteMensual=data.data
+            this.reporteMensual = data.data
             this.fechaMensual = (document.getElementById('customDate') as HTMLInputElement).value;
             this.closeModal()
-            setTimeout(() => { 
+            setTimeout(() => {
               this.openModal(template);
-            },500);
+            }, 500);
           },
-          err=> {
+          err => {
             this.closeModal();
             console.error('Error al cargar el archivo', err);
           }
@@ -121,23 +125,23 @@ export class IngresosComponent {
   }
 
   openModal(template: TemplateRef<any>) {
-    this.bsModalRef = this.modalService.show(template,{
+    this.bsModalRef = this.modalService.show(template, {
       backdrop: 'static',
       keyboard: false
     });
     console.log(this.esModoOscuro)
   }
 
-  
+
   closeModal() {
-    this.clearFileInput(); 
+    this.clearFileInput();
     this.bsModalRef?.hide();
   }
 
 
   clearFileInput() {
-      this.selectedFile = undefined; // Limpia la variable selectedFile
-      this.selectedFileName = undefined; // Limpia el nombre del archivo seleccionado
+    this.selectedFile = undefined; // Limpia la variable selectedFile
+    this.selectedFileName = undefined; // Limpia el nombre del archivo seleccionado
   }
 
   insertarReporteMensual() {
@@ -149,7 +153,7 @@ export class IngresosComponent {
     };
     const dataMensual = {
       auxiliares_total_mes: this.reporteMensual.DatosMensuales.auxiliares_total_mes,
-      inscripciones_total_mes:this. reporteMensual.DatosMensuales.inscripciones_total_mes,
+      inscripciones_total_mes: this.reporteMensual.DatosMensuales.inscripciones_total_mes,
       subvenciones_total_mes: this.reporteMensual.DatosMensuales.subvenciones_total_mes,
       titulos_total_mes: this.reporteMensual.DatosMensuales.titulos_total_mes,
       ventaProductos_total_mes: this.reporteMensual.DatosMensuales.ventaProductos_total_mes,
@@ -161,49 +165,76 @@ export class IngresosComponent {
       response => {
         console.log('Información enviada con éxito', response);
         this.closeModal();
-        this.homeService.notifyUpdate(true); 
+        this.homeService.notifyUpdate(true);
       },
       error => {
         console.error('Error al enviar la información', error);
-        this.closeModal(); 
+        this.closeModal();
       }
     );
-  } 
+  }
 
   filtrarRegistros() {
     const fechaInicio = this.miFormulario?.get('fechaInicio')?.value;
     const fechaFin = this.miFormulario.get('fechaFin')?.value;
 
-    if(this.switchDiario==false){
+    if (this.switchDiario == false) {
       this.ingresoService.obtenerReportesPorMes(fechaInicio, fechaFin).subscribe(
         data => {
           this.reportes = data;
-          console.log(this.reportes);
+          let object = {};
 
-      
+          // Se genera un array para generar la grafica
+          let array: object[] = [];
+
+          // Se genera la grafica con un forEach
           this.reportes.forEach((dato: any) => {
-            this.lineSeries.update(
-              { time: this.filtrarFecha(dato.fecha) , value: dato.data.total_mes },
-              );
+            object = { time: this.filtrarFecha(dato.fecha), value: dato.data.total_mes }
+            array.push(object);
           });
+
+          // Se agrega la información para generar la grafica
+          this.lineSeries.setData(array);
+          this.areaSeries.setData(array);
 
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
         }
       );
-    }else { 
+    } else {
       this.ingresoService.obtenerReportesPorDias(fechaInicio, fechaFin).subscribe(
         data => {
           this.IngresosDiarios = data;
-          console.log(this.IngresosDiarios);
+
+          let object = {}
+
+          // Se genera un array para generar la grafica
+          let array: object[] = [];
+
+          // Se genera la grafica con un forEach
+          this.IngresosDiarios.forEach((dato: any) => {
+            object = { time: this.filtrarFecha(dato.fecha), value: parseInt(dato.total) }
+            array.push(object);
+          });
+
+          console.log(array)
+          // Se agrega la información para generar la grafica
+          this.lineSeries.setData(array);
+          this.areaSeries.setData(array);
+
+          this.chart.timeScale().fitContent();
+
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
         }
       );
     }
-    
+
+    // Acomoda la grafica a los contenidos mostrados
+    this.chart.timeScale().fitContent();
+
   }
 
   get displayedItems(): any[] {
@@ -241,7 +272,7 @@ export class IngresosComponent {
     return null;
   }
 
-  verDetalleReporteMensual(template: TemplateRef<any>,id: number){ 
+  verDetalleReporteMensual(template: TemplateRef<any>, id: number) {
     this.openModal(template);
     this.ingresoService.obtenerReporteMensualPorID(id).subscribe(
       data => {
@@ -288,35 +319,135 @@ export class IngresosComponent {
           )
         }
       })
+
   }
 
   private isSocketAvailable(): boolean {
     return this.socket.connected;
   }
 
+  modoOscuro() {
+    this.homeService.modoOscuro.subscribe((value: boolean) => {
+      if (value == false) {
+        this.chart.applyOptions({
+          layout: {
+            background: {
+              color: '#212529',
+            },
+            textColor: '#fff',
+          },
+        })
+      }
+      
+      if (value == true) { 
+        this.chart.applyOptions({
+          layout: {
+            background: {
+              color: '#000000',
+            },
+            textColor: '#fff',
+          },
+        })
+      }
+
+    })
+  }
+
   ngOnInit(): void {
+
 
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
       this.esModoOscuro = modoOscuro;
     });
 
+    // Get the current users primary locale
+    const currentLocale = window.navigator.languages[0];
+
+    // Create a number format using Intl.NumberFormat
+    const myPriceFormatter = Intl.NumberFormat(currentLocale, {
+      style: 'currency',
+      currency: 'MXN', // Currency for data points
+    }).format;
+
     this.chart = createChart('chart-container', {
-      width: 800, // Personaliza el ancho
-      height: 400, // Personaliza la altura
+      localization: {
+        priceFormatter: myPriceFormatter,
+      },
+      layout: {
+        background: {
+          color: '#000000',
+        },
+        textColor: '#d1d4dc',
+        fontFamily: "'Roboto', sans-serif"
+      },
+      grid: {
+        vertLines: {
+          visible: false,
+        },
+        horzLines: {
+          color: 'rgba(42, 46, 57, 0.5)',
+        },
+      },
+      rightPriceScale: {
+        borderVisible: false,
+      },
+      timeScale: {
+        borderVisible: false,
+      },
+
     });
 
-    this.lineSeries = this.chart.addLineSeries();
+    this.chart.applyOptions({
+      crosshair: {
+        style: LineStyle.Solid,
+        // Change mode from default 'magnet' to 'normal'.
+        // Allows the crosshair to move freely without snapping to datapoints
+        mode: CrosshairMode.Normal,
+
+        // Vertical crosshair line (showing Date in Label)
+        vertLine: {
+          width: 8,
+          color: "#C3BCDB44",
+
+          labelBackgroundColor: "#9B7DFF",
+        },
+
+        // Horizontal crosshair line (showing Price in Label)
+        horzLine: {
+          color: "#9B7DFF",
+          labelBackgroundColor: "#9B7DFF",
+        },
+      },
+    });
+
+    this.areaSeries = this.chart.addAreaSeries({
+      topColor: 'rgba(76, 175, 80, 0.56)',
+      bottomColor: 'rgba(76, 175, 80, 0.04)',
+      lineColor: 'transparent', // hide the line
+      lineWidth: 2,
+      lastValueVisible: false, // hide the last value marker for this series
+      crosshairMarkerVisible: false, // hide the crosshair marker for this series
+
+    });
+    // Set the data for the Area Series
+
+
+    this.lineSeries = this.chart.addLineSeries({ color: '#47CA47' });
 
     const datos = [
       { time: '2023-01-01', value: 0 },
+
     ];
 
     datos.forEach((dato: any) => {
       this.lineSeries.update(
         dato
-        );
+      );
+      this.areaSeries.update(dato);
     });
+
     console.log(this.esModoOscuro)
+
   }
 
   filtrarFecha(fechaOriginal: any): String {
@@ -324,10 +455,10 @@ export class IngresosComponent {
     const year = fecha.getFullYear(); // Obtiene el año
     const month = (fecha.getMonth() + 1).toString().padStart(2, '0'); // Obtiene el mes y lo formatea
     const day = fecha.getDate().toString().padStart(2, '0'); // Obtiene el día y lo formatea
-  
+
     const fechaFormateada = `${year}-${month}-${day}`; // Crea la fecha formateada
-  
+
     return fechaFormateada;
   }
-  
+
 }

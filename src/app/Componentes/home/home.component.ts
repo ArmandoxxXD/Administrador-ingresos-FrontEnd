@@ -3,6 +3,7 @@ import { forkJoin } from 'rxjs';
 import { GastoService } from 'src/app/Servicios/gasto.service';
 import { HomeService } from 'src/app/Servicios/home.service';
 import { IngresoService } from 'src/app/Servicios/ingreso.service';
+import { Observable } from 'rxjs';
 import * as echarts from 'echarts';
 
 @Component({
@@ -13,17 +14,20 @@ import * as echarts from 'echarts';
 export class HomeComponent implements OnInit {
 
   totalIngreso: number = 0;
-  totalGastos: number = 0;
-  Diferencias: number = 0;
   esModoOscuro:boolean = false;
+  total: number = 0;
+  totalGastos: number = 15600;
+
+  // Variable graficas
+  chartDom: any
+  myChart: any
 
   constructor
-  (
-    private ingresoService:IngresoService,
-    private gastosService:GastoService,
-    private homeService:HomeService
-  ) 
-  {
+    (
+      private ingresoService: IngresoService,
+      private gastosService: GastoService,
+      private homeService: HomeService
+    ) {
 
   }
 
@@ -34,6 +38,7 @@ export class HomeComponent implements OnInit {
     });
 
     this.getTotales();
+    this.modoOscuro();
 
     this.homeService.currentUpdate.subscribe(updated => {
       if (updated) {
@@ -46,23 +51,63 @@ export class HomeComponent implements OnInit {
   getTotales() {
     forkJoin({
       ingreso: this.ingresoService.obtenerIngresosTotales(),
-      gasto: this.gastosService.obtenerIngresosTotales()
+      gasto: this.gastosService.obtenerGastosTotales()
     }).subscribe(result => {
       this.totalIngreso = result.ingreso.suma_total_mes;
       this.totalGastos = result.gasto.suma_total_mes;
 
       // Aquí es donde debes realizar el cálculo
-      this.Diferencias = this.totalIngreso - this.totalGastos;
+      this.total = this.totalIngreso - this.totalGastos;
       this.actualizarGrafica();
     },
-    error => {
-      console.error('Error obteniendo los reportes:', error);
-    });
+      error => {
+        console.error('Error obteniendo los reportes:', error);
+      });
+  }
+
+  modoOscuro() {
+    this.homeService.modoOscuro.subscribe((value: boolean) => {
+
+      if (value == false) {
+        this.myChart.setOption({
+          theme: 'light', // Aplica el tema oscuro
+          backgroundColor: '#ffffff', // Cambia el color de fondo a blanco
+          textStyle: {
+            color: '#000000' // Cambia el color del texto a negro
+          },
+          legend: {
+            textStyle: {
+              color: 'black' // Cambia el color del texto de la leyenda a blanco
+            }
+          },
+        })
+        console.log(value)
+      }
+
+
+      if (value == true) {
+        this.myChart.setOption({
+          theme: 'dark', // Aplica el tema oscuro
+          backgroundColor: '#212529', // Cambia el color de fondo a negro
+          textStyle: {
+            color: '#ffffff' // Cambia el color del texto a blanco
+          },
+          legend: {
+            textStyle: {
+              color: 'white' // Cambia el color del texto de la leyenda a blanco
+            }
+          },
+        })
+        console.log(value)
+      }
+
+
+    })
   }
 
   actualizarGrafica() {
-    var chartDom = document.getElementById('grafica-Principal');
-    var myChart = echarts.init(chartDom);
+    this.chartDom = document.getElementById('Grafica-Principal');
+    this.myChart = echarts.init(this.chartDom);
     var option;
 
     option = {
@@ -80,7 +125,7 @@ export class HomeComponent implements OnInit {
           type: 'pie',
           radius: '92%',
           data: [
-            { value: this.totalIngreso, name: 'Ingresos' },
+            { value: this.total, name: 'Ingresos' },
             { value: this.totalGastos, name: 'Gastos' }
           ],
           emphasis: {
@@ -94,7 +139,8 @@ export class HomeComponent implements OnInit {
       ]
     };
 
-    option && myChart.setOption(option);
+
+    option && this.myChart.setOption(option);
   }
 
 }
