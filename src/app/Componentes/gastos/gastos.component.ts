@@ -33,6 +33,7 @@ export class GastosComponent {
   currentPage = 1;
   itemsPerPage = 10;
   fechavalid: boolean = false;
+  esModoOscuro:boolean = false;
 
   // Variables Grafica
   private chart: any; // Declarar la variable para el gráfico

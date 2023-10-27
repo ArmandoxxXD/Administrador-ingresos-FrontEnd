@@ -14,6 +14,7 @@ import * as echarts from 'echarts';
 export class HomeComponent implements OnInit {
 
   totalIngreso: number = 0;
+  esModoOscuro:boolean = false;
   total: number = 0;
   totalGastos: number = 15600;
 
@@ -31,6 +32,11 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    
+    this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
+      this.esModoOscuro = modoOscuro;
+    });
+
     this.getTotales();
     this.modoOscuro();
 
