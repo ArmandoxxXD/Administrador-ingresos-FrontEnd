@@ -26,21 +26,5 @@ export class HeaderComponent implements OnInit{
     this.path = this.router.url;
   }
 
-  TemaOscuro = () => {
-    document.querySelector('body')?.setAttribute("data-bs-theme", "dark");
-    document.querySelector('#btnCambiarTema')?.setAttribute("data-bs-theme", "dark"); 
-    
-    this.homeServices.modoOscuro.next(true);
-  }
-
-  TemaClaro = () => {
-    document.querySelector('body')?.setAttribute("data-bs-theme", "light");
-    document.querySelector('#btnCambiarTema')?.setAttribute("data-bs-theme", "light");
-    this.homeServices.modoOscuro.next(false);
-  }
-
-  CambiarTema = () => {
-    document.querySelector('body')?.getAttribute("data-bs-theme") === 'light' ? this.TemaOscuro() :this.TemaClaro();
-  }
     
 }

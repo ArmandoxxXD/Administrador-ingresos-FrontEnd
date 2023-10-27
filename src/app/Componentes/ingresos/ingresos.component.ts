@@ -1,10 +1,11 @@
-import { Component, ElementRef, ViewChild, NgZone, TemplateRef, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, NgZone, TemplateRef, OnInit,OnChanges } from '@angular/core';
 import { IngresoService } from 'src/app/Servicios/ingreso.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { io, Socket } from 'socket.io-client';
 import { HomeService } from 'src/app/Servicios/home.service';
-
+import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
 import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
 
 @Component({
@@ -38,14 +39,17 @@ export class IngresosComponent {
   // Variables Grafica
   private chart: any; // Declarar la variable para el gráfico
   private lineSeries: any;
+  esModoOscuro:boolean = false;
   private areaSeries: any;
+
 
   constructor(
     private ingresoService: IngresoService,
     private homeService: HomeService,
     private modalService: BsModalService,
     private fb: FormBuilder,
-    private zone: NgZone
+    private zone: NgZone,
+    private toast: ToastrService
   ) {
     this.miFormulario = this.fb.group({
       fechaInicio: [null, Validators.required],
@@ -56,9 +60,6 @@ export class IngresosComponent {
       fechaRegistro: [null, Validators.required],
     });
     this.socket = io('http://localhost:2000');
-
-
-
 
   }
 
@@ -103,7 +104,7 @@ export class IngresosComponent {
               this.socket.emit('excel-procesado', data.message);
             } else {
               // El servicio Socket.io no está disponible, maneja el mensaje local
-              window.alert(data.message);
+              this.toast.success(data.message,'OK',{timeOut:3000});
             }
             this.reporteMensual = data.data
             this.fechaMensual = (document.getElementById('customDate') as HTMLInputElement).value;
@@ -128,6 +129,7 @@ export class IngresosComponent {
       backdrop: 'static',
       keyboard: false
     });
+    console.log(this.esModoOscuro)
   }
 
 
@@ -283,23 +285,41 @@ export class IngresosComponent {
     )
   }
 
-  eliminarReporteMensual(id: number) {
-    this.ingresoService.eliminarReporteDiarioPorId(id).subscribe(
-      async data => {
-        if (this.isSocketAvailable()) {
-          // El servicio Socket.io está disponible, envía el mensaje global
-          this.socket.emit('reporte-eliminado', data);
-          this.homeService.notifyUpdate(true);
-        } else {
-          // El servicio Socket.io no está disponible, maneja el mensaje local
-          window.alert(data);
+  eliminarReporteMensual(id: number){ 
+    Swal.fire({
+      title: '¿Estas Seguro?',
+      text: 'No podras desaser la acción',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancelar'
+    }).then((result)=>{
+        if(result.value){
+          this.ingresoService.eliminarReporteDiarioPorId(id).subscribe(
+            async data => {
+              if (this.isSocketAvailable()) {
+                // El servicio Socket.io está disponible, envía el mensaje global
+                this.socket.emit('reporte-eliminado', data);
+                this.homeService.notifyUpdate(true); 
+              } else {
+                // El servicio Socket.io no está disponible, maneja el mensaje local
+                this.toast.success(data,'OK',{timeOut:3000});
+              }
+              this.filtrarRegistros()
+            },
+            error => {
+              console.error('Error obteniendo los reportes:', error);
+            }
+          )
+        }else if(result.dismiss===Swal.DismissReason.cancel){
+          Swal.fire(
+            'Cancelado',
+            'Ingreso no eliminado',
+            'error'
+          )
         }
-        await this.filtrarRegistros()
-      },
-      error => {
-        console.error('Error obteniendo los reportes:', error);
-      }
-    )
+      })
+
   }
 
   private isSocketAvailable(): boolean {
@@ -334,6 +354,11 @@ export class IngresosComponent {
   }
 
   ngOnInit(): void {
+
+
+    this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
+      this.esModoOscuro = modoOscuro;
+    });
 
     // Get the current users primary locale
     const currentLocale = window.navigator.languages[0];
@@ -421,7 +446,7 @@ export class IngresosComponent {
       this.areaSeries.update(dato);
     });
 
-    this.modoOscuro();
+    console.log(this.esModoOscuro)
 
   }
 

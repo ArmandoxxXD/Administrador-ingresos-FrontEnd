@@ -1,0 +1,10 @@
+.button-mode-background{
+    position: fixed;
+    right: 10px;
+    bottom: 500px;
+    height: 70px;
+    width: 70px;
+    border-radius: 50%;
+    font-size: 35px;
+    text-align: center;
+}
