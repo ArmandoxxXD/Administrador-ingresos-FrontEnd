@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -49,7 +51,7 @@ export class GastoService {
     return this.httpClient.delete<any>(this.clienteURL+ `eliminar-reporte-mensual-porId/${id}`)
   }
 
-  public obtenerIngresosTotales():Observable<any> {
+  public obtenerGastosTotales():Observable<any> {
     return this.httpClient.get<any>(this.clienteURL+ `suma-total-mes`)
   }
 

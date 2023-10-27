@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { io, Socket } from 'socket.io-client';
 import { HomeService } from 'src/app/Servicios/home.service';
 
-import { createChart } from 'lightweight-charts';
+import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
 
 @Component({
   selector: 'app-ingresos',
@@ -192,7 +192,8 @@ export class IngresosComponent {
           });
 
           // Se agrega la información para generar la grafica
-          this.lineSeries.setData(array)
+          this.lineSeries.setData(array);
+          this.areaSeries.setData(array);
 
         },
         error => {
@@ -203,7 +204,6 @@ export class IngresosComponent {
       this.ingresoService.obtenerReportesPorDias(fechaInicio, fechaFin).subscribe(
         data => {
           this.IngresosDiarios = data;
-          console.log(this.IngresosDiarios);
 
           let object = {}
 
@@ -218,7 +218,11 @@ export class IngresosComponent {
 
           console.log(array)
           // Se agrega la información para generar la grafica
-          this.lineSeries.setData(array)
+          this.lineSeries.setData(array);
+          this.areaSeries.setData(array);
+
+          this.chart.timeScale().fitContent();
+
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
@@ -302,14 +306,54 @@ export class IngresosComponent {
     return this.socket.connected;
   }
 
+  modoOscuro() {
+    this.homeService.modoOscuro.subscribe((value: boolean) => {
+      if (value == false) {
+        this.chart.applyOptions({
+          layout: {
+            background: {
+              color: '#212529',
+            },
+            textColor: '#fff',
+          },
+        })
+      }
+      
+      if (value == true) { 
+        this.chart.applyOptions({
+          layout: {
+            background: {
+              color: '#000000',
+            },
+            textColor: '#fff',
+          },
+        })
+      }
+
+    })
+  }
+
   ngOnInit(): void {
 
+    // Get the current users primary locale
+    const currentLocale = window.navigator.languages[0];
+
+    // Create a number format using Intl.NumberFormat
+    const myPriceFormatter = Intl.NumberFormat(currentLocale, {
+      style: 'currency',
+      currency: 'MXN', // Currency for data points
+    }).format;
+
     this.chart = createChart('chart-container', {
+      localization: {
+        priceFormatter: myPriceFormatter,
+      },
       layout: {
         background: {
           color: '#000000',
         },
         textColor: '#d1d4dc',
+        fontFamily: "'Roboto', sans-serif"
       },
       grid: {
         vertLines: {
@@ -325,14 +369,28 @@ export class IngresosComponent {
       timeScale: {
         borderVisible: false,
       },
+
+    });
+
+    this.chart.applyOptions({
       crosshair: {
+        style: LineStyle.Solid,
+        // Change mode from default 'magnet' to 'normal'.
+        // Allows the crosshair to move freely without snapping to datapoints
+        mode: CrosshairMode.Normal,
+
+        // Vertical crosshair line (showing Date in Label)
         vertLine: {
-          color: 'rgba(224, 227, 235, 0.1)',
-          style: 0,
+          width: 8,
+          color: "#C3BCDB44",
+
+          labelBackgroundColor: "#9B7DFF",
         },
+
+        // Horizontal crosshair line (showing Price in Label)
         horzLine: {
-          visible: false,
-          labelVisible: true,
+          color: "#9B7DFF",
+          labelBackgroundColor: "#9B7DFF",
         },
       },
     });
@@ -352,13 +410,8 @@ export class IngresosComponent {
     this.lineSeries = this.chart.addLineSeries({ color: '#47CA47' });
 
     const datos = [
-      { time: '2023-01-01', value: 100 },
-      { time: '2023-05-01', value: 2500 },
-      { time: '2023-09-01', value: 3000 },
-      { time: '2024-01-01', value: 1000 },
-      { time: '2024-05-01', value: 2500 },
-      { time: '2024-09-01', value: 3100 },
-      { time: '2025-01-01', value: 1500 },
+      { time: '2023-01-01', value: 0 },
+
     ];
 
     datos.forEach((dato: any) => {
@@ -368,22 +421,7 @@ export class IngresosComponent {
       this.areaSeries.update(dato);
     });
 
-    this.chart.timeScale().fitContent();
-
-    // Get the current users primary locale
-    const currentLocale = window.navigator.languages[0];
-
-    // Create a number format using Intl.NumberFormat
-    const myPriceFormatter = Intl.NumberFormat(currentLocale, {
-      style: 'currency',
-      currency: 'MX', // Currency for data points
-    }).format;
-
-    this.chart.applyOptions({
-      localization: {
-        priceFormatter: myPriceFormatter,
-      },
-    });
+    this.modoOscuro();
 
   }
 

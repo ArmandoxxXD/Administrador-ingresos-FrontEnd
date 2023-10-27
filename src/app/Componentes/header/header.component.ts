@@ -30,13 +30,13 @@ export class HeaderComponent implements OnInit{
     document.querySelector('body')?.setAttribute("data-bs-theme", "dark");
     document.querySelector('#btnCambiarTema')?.setAttribute("data-bs-theme", "dark"); 
     
-    this.homeServices.modoOscuro = true;
+    this.homeServices.modoOscuro.next(true);
   }
 
   TemaClaro = () => {
     document.querySelector('body')?.setAttribute("data-bs-theme", "light");
     document.querySelector('#btnCambiarTema')?.setAttribute("data-bs-theme", "light");
-    this.homeServices.modoOscuro = false;
+    this.homeServices.modoOscuro.next(false);
   }
 
   CambiarTema = () => {

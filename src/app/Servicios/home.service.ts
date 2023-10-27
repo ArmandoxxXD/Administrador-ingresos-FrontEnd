@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 export class HomeService {
   private updateSource = new BehaviorSubject<boolean>(false); // inicialmente falso
   currentUpdate = this.updateSource.asObservable();
-  modoOscuro: boolean = false;
+  modoOscuro = new BehaviorSubject<boolean>(false);
 
   notifyUpdate(status: boolean) {
     this.updateSource.next(status);
