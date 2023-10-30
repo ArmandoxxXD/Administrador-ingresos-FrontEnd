@@ -15,6 +15,7 @@ import * as echarts from 'echarts';
 export class HomeComponent implements OnInit {
 
   esModoOscuro: boolean = false;
+  hayDatos: boolean = true;
   totalIngreso: number = 0;
   total: number = 0;
   totalGastos: number = 15600;
@@ -81,23 +82,6 @@ export class HomeComponent implements OnInit {
   }
 
 
-  filtrarRegistros() {
-    const fechaInicio = this.miFormulario?.get('fechaInicio')?.value;
-    const fechaFin = this.miFormulario.get('fechaFin')?.value;
-
-    this.ingresoService.obtenerReportesPorMes(fechaInicio, fechaFin).subscribe(
-      data => {
-        this.reportes = data;
-
-
-      },
-      error => {
-        console.error('Error obteniendo los reportes:', error);
-      }
-    );
-
-  }
-
   getTotales() {
     forkJoin({
       ingreso: this.ingresoService.obtenerIngresosTotales(),
@@ -105,7 +89,11 @@ export class HomeComponent implements OnInit {
     }).subscribe(result => {
       this.totalIngreso = result.ingreso.suma_total_mes;
       this.totalGastos = result.gasto.suma_total_mes;
-       
+      if (this.totalIngreso === null && this.totalGastos === null) {
+        this.hayDatos = false;
+      } else {
+        this.hayDatos = true;
+     }
 
       // Aquí es donde debes realizar el cálculo
       this.total = this.totalIngreso - this.totalGastos;
@@ -184,7 +172,7 @@ export class HomeComponent implements OnInit {
           type: 'pie',
           radius: '92%',
           data: [
-            { value: this.total, name: 'Ingresos' },
+            { value: this.totalIngreso, name: 'Ingresos' },
             { value: this.totalGastos, name: 'Gastos' }
           ],
           emphasis: {
@@ -201,5 +189,34 @@ export class HomeComponent implements OnInit {
 
     option && this.myChart.setOption(option);
   }
+
+  filtrarRegistros(){
+    this.homeService.notifyUpdate(true); 
+    const fechaInicio = this.miFormulario?.get('fechaInicio')?.value;
+    const fechaFin = this.miFormulario.get('fechaFin')?.value;
+
+      forkJoin({
+        ingreso: this.ingresoService.obtenerIngresosTotalesporFecha(fechaInicio,fechaFin),
+        gasto: this.gastosService.obtenerGastosTotalesporFecha(fechaInicio,fechaFin)
+      }).subscribe(result => {
+        this.totalIngreso = result.ingreso.suma_total_mes;
+        this.totalGastos = result.gasto.suma_total_mes;
+        if (this.totalIngreso === null && this.totalGastos === null) {
+          this.hayDatos = false;
+        } else {
+          this.hayDatos = true;
+        }
+  
+        // Aquí es donde debes realizar el cálculo
+        this.total = this.totalIngreso - this.totalGastos;
+        this.actualizarGrafica();
+        this.ingresoFormato = this.formatoDinero(this.totalIngreso);
+        this.gastoFormato = this.formatoDinero(this.totalGastos);
+        this.totalFormato = this.formatoDinero(this.total);
+      },
+        error => {
+          console.error('Error obteniendo los reportes:', error);
+        });
+  } 
 
 }
