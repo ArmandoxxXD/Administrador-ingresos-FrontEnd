@@ -1,8 +1,7 @@
-<div class="web_body">
-<app-header></app-header>
-<router-outlet></router-outlet>
-</div>
-<!--Boton flotante-->
-<div>
-    <button class="btn" [class.button-mode-background-light]="theme === 'light'" [class.button-mode-background-dark]="theme === 'dark'" (click)="CambiarTema()"><i id="icon" class="fa-solid fa-moon"></i></button>
+
+<div class="parent">
+    <header><app-header></app-header></header>
+    <main class="container">
+        <button class="btn" [class.button-mode-background-light]="theme === 'light'" [class.button-mode-background-dark]="theme === 'dark'" (click)="CambiarTema()"><i id="icon" class="fa-solid fa-moon"></i></button>
+    </main>
 </div>
