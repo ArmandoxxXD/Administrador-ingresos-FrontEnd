@@ -1,13 +1,39 @@
-<div class="content col-12">
-    <ul class="nav nav-tabs justify-content-center">
-        <li class="nav-item col-4">
-            <a class="btn btn-outline-primary w-100 btn-lg" [class.active]="getPath() === '/home'" routerLink="/home">Administracion</a>
-        </li>
-        <li class="nav-item col-4">
-            <a class="btn btn-outline-primary w-100 btn-lg" [class.active]="getPath() === '/ingresos'" routerLink="/ingresos">Ingresos</a>
-        </li>
-        <li class="nav-item col-4">
-            <a class="btn btn-outline-primary w-100 btn-lg" [class.active]="getPath() === '/gastos'" routerLink="/gastos">Gastos</a>
-        </li>
-    </ul>
+<div class="header">
+    <div class="header__Logo">
+        <h5>G</h5>
+        <p>GRAPH +</p>
+    </div>
+
+    <div class="header__options">
+        <div class="header__options__icons">
+            <a class="header__options__icons__link__home" routerLink="/home" >
+                <i id="header__home" class="fa-solid fa-house" [class.active]="getPath() === '/home'" ></i>
+            </a>
+
+            <a class="header__options__icons__link__ingresos" routerLink="/ingresos">
+                <i id="header__ingresos" class="fa-solid fa-money-bill-trend-up"  [class.active]="getPath() === '/ingresos'"></i>
+            </a>
+
+            <a class="header__options__icons__link__gastos" routerLink="/gastos" >
+                <i id="header__gastos" class="fa-sharp fa-solid fa-arrow-trend-down" [class.active]="getPath() === '/gastos'"></i>
+            </a>
+        </div>
+        <div class="header__options__text">
+            <div>
+                <a id="header__home" class="header__options__icons__link" routerLink="/home">
+                <h5 [class.active]="getPath() === '/home'"> Gestión </h5>
+                </a> 
+            </div>
+            <div>
+                <a id="header__ingresos" class="header__options__icons__link" routerLink="/ingresos">
+                    <h5  [class.active]="getPath() === '/ingresos'"> Ingresos </h5>
+                </a>
+            </div>
+            <div>
+                <a id="header__gastos" class="header__options__icons__link" routerLink="/gastos">
+                <h5 [class.active]="getPath() === '/gastos'"> Gastos </h5>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
