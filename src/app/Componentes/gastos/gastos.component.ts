@@ -33,7 +33,7 @@ export class GastosComponent {
   currentPage = 1;
   itemsPerPage = 10;
   fechavalid: boolean = false;
-  esModoOscuro:boolean = false;
+  esModoOscuro: boolean = false;
 
   // Variables Grafica
   private chart: any; // Declarar la variable para el gráfico
@@ -157,7 +157,7 @@ export class GastosComponent {
     };
     const dataMensual = {
       salarios_total_mes: this.reporteMensual.DatosMensuales.salarios_total_mes,
-      infraestructura_Mantenimiento_total_mes:this. reporteMensual.DatosMensuales.infraestructura_Mantenimiento_total_mes,
+      infraestructura_Mantenimiento_total_mes: this.reporteMensual.DatosMensuales.infraestructura_Mantenimiento_total_mes,
       becas_total_mes: this.reporteMensual.DatosMensuales.becas_total_mes,
       tecnologiaRecursosAprendizaje_total_mes: this.reporteMensual.DatosMensuales.tecnologiaRecursosAprendizaje_total_mes,
       serviciosEstudiantiles_total_mes: this.reporteMensual.DatosMensuales.serviciosEstudiantiles_total_mes,
@@ -169,11 +169,11 @@ export class GastosComponent {
       response => {
         console.log('Información enviada con éxito', response);
         this.closeModal();
-        this.homeService.notifyUpdate(true); 
+        this.homeService.notifyUpdate(true);
       },
       error => {
         console.error('Error al enviar la información', error);
-        this.closeModal(); 
+        this.closeModal();
       }
     );
   }
@@ -292,21 +292,21 @@ export class GastosComponent {
   private isSocketAvailable(): boolean {
     return this.socket.connected;
   }
-  
+
   modoOscuro() {
     this.homeService.modoOscuro.subscribe((value: boolean) => {
       if (value == false) {
         this.chart.applyOptions({
           layout: {
             background: {
-              color: '#212529',
+              color: '#000000',
             },
             textColor: '#fff',
           },
         })
       }
-      
-      if (value == true) { 
+
+      if (value == true) {
         this.chart.applyOptions({
           layout: {
             background: {
@@ -372,7 +372,7 @@ export class GastosComponent {
         // Vertical crosshair line (showing Date in Label)
         vertLine: {
           width: 8,
-          color: "#C3BCDB44",
+          color: "#000000",
 
           labelBackgroundColor: "#9B7DFF",
         },
@@ -410,6 +410,8 @@ export class GastosComponent {
       );
       this.areaSeries.update(dato);
     });
+
+
 
     this.modoOscuro();
   }
