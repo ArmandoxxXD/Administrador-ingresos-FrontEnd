@@ -73,6 +73,15 @@ export class IngresosComponent {
     }
   }
 
+  onFileDrop(file: File) {
+    this.selectedFile = file;
+    if (this.selectedFile) {
+      this.selectedFileName = file.name;
+    } else {
+      this.selectedFileName = undefined;
+    }
+  }
+
   validarFecha(fecha: string) {
     this.ingresoService.validarMesAño(fecha).subscribe(
       response => {

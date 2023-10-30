@@ -20,14 +20,14 @@
                 <form [formGroup]="miFormulario">
                     <div class="seleccionar_fecha__body">
                         <div class="seleccionar_fecha__fecha">
-                            <input type="date" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
+                            <input type="month" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
                             <label for="fechaInicio">Fecha Inicio</label>
                         </div>
                         <div class="seleccionar_fecha__flecha">
                             <i class="fa-solid fa-arrow-right-long"></i>
                         </div>
                         <div class="seleccionar_fecha__fecha">
-                            <input type="date" class="form-control" id="rangoFecha2" formControlName="fechaFin">
+                            <input type="month" class="form-control" id="rangoFecha2" formControlName="fechaFin">
                             <label for="fechaFin">Fecha Fin</label>
                         </div>
                         <div class="seleccionar_fecha__boton">
@@ -46,7 +46,10 @@
 
     </div>
     <div class="home__opciones__grafica">
-        <div class="home__grafica" id="Grafica-Principal">
+        <div class="home__grafica" id="Grafica-Principal" *ngIf="hayDatos">
+        </div>
+        <div  *ngIf="!hayDatos">
+            <h2>No hay datos disponibles</h2>
         </div>
     </div>
 </div>

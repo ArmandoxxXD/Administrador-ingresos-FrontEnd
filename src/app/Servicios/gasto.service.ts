@@ -55,4 +55,7 @@ export class GastoService {
     return this.httpClient.get<any>(this.clienteURL+ `suma-total-mes`)
   }
 
+  public obtenerGastosTotalesporFecha(fechaInicial:string, fechaFinal: string):Observable<any> {
+    return this.httpClient.get<any>(this.clienteURL+ `suma-total-mes/${fechaInicial}/${fechaFinal}`)
+  }
 }

@@ -14,6 +14,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { DndFormatDirective } from './directives/dnd-format.directive';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
     IngresosComponent,
     GastosComponent,
     HomeComponent,
-    HeaderComponent
+    HeaderComponent,
+    DndFormatDirective
   ],
   imports: [
     NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
