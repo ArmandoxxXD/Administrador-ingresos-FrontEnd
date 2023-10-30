@@ -378,7 +378,7 @@ export class IngresosComponent {
       currency: 'MXN', // Currency for data points
     }).format;
 
-    this.chart = createChart('chart-container', {
+    this.chart = createChart('chart-container-ingresos', {
       localization: {
         priceFormatter: myPriceFormatter,
       },

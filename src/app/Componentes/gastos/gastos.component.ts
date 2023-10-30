@@ -335,7 +335,7 @@ export class GastosComponent {
       currency: 'MXN', // Currency for data points
     }).format;
 
-    this.chart = createChart('chart-container', {
+    this.chart = createChart('chart-container-gastos', {
       localization: {
         priceFormatter: myPriceFormatter,
       },
