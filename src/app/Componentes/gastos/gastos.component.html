@@ -106,8 +106,12 @@
       <form [formGroup]="miFormulario2" (ngSubmit)="onSubmit($event,template2)">
         <div class="justify-content-center">
           <div class="input-group mb-3">
-            <div dropZoneFormat class="drop-xlsx" (dropFormat)="onFileDrop($event)" (click)="fileInput.click()">
-                Seleccionar Archivo
+            <div dropZoneFormat class="drop-xlsx" (dropFormat)="onFileDrop($event)" *ngIf="selectedFile === undefined" (click)="fileInput.click()">
+              Seleccionar Archivo
+            </div>
+
+            <div class="drop-xlsx-disable" *ngIf="selectedFile != undefined" (click)="fileInput.click()">
+              {{selectedFileName}}
             </div>
 
             <input type="file" class="form-control" id="customFile" accept=".xlsx" formControlName="archivo"
