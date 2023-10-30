@@ -1,21 +1,52 @@
-<div class="datos mt-3">
-    <div class="datos__grupo">
-        <div>
-            <h6>Total Ingresos: </h6>
-            <p>{{ totalIngreso}}</p>
+<div class="home">
+    <div class="home__opciones">
+        <div class="home__opciones__datos">
+            <div>
+                <h6>Total: </h6>
+                <p id="datos_total">{{ totalFormato }}</p>
+            </div>
+            <div>
+                <h6>Ingresos: </h6>
+                <p id="datos_ingresos">{{ ingresoFormato }}</p>
+            </div>
+            <div>
+                <h6>Gastos: </h6>
+                <p id="datos_gastos">{{ gastoFormato}}</p>
+            </div>
         </div>
-        <div>
-            <h6>Total Gastos: </h6>
-            <p>{{ totalGastos}}</p>
-        </div>
-        <div>
-            <h6>Total restante de ingresos: </h6>
-            <p>{{ total}}</p>
-        </div>
-    </div>
-</div>
 
-<div class="home__body ms-5">
-    <div class="home__grafica" id="Grafica-Principal">
+        <div class="home__opciones__seleccionar_fecha">
+            <div class="fecha_form">
+                <form [formGroup]="miFormulario">
+                    <div class="seleccionar_fecha__body">
+                        <div class="seleccionar_fecha__fecha">
+                            <input type="date" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
+                            <label for="fechaInicio">Fecha Inicio</label>
+                        </div>
+                        <div class="seleccionar_fecha__flecha">
+                            <i class="fa-solid fa-arrow-right-long"></i>
+                        </div>
+                        <div class="seleccionar_fecha__fecha">
+                            <input type="date" class="form-control" id="rangoFecha2" formControlName="fechaFin">
+                            <label for="fechaFin">Fecha Fin</label>
+                        </div>
+                        <div class="seleccionar_fecha__boton">
+                            <button type="button" class="btn btn-outline-success btn-block" id="boton-filtrar"
+                                [disabled]="miFormulario.invalid" (click)="filtrarRegistros()">Filtrar
+                            </button>
+                            <div *ngIf="miFormulario.hasError('dateRangeInvalid')">
+                                El rango de fechas no es válido.
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <div class="home__opciones__grafica">
+        <div class="home__grafica" id="Grafica-Principal">
+        </div>
     </div>
 </div>

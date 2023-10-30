@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 export class AppComponent implements OnInit{
   title = 'FrontEnd';
   private socket: Socket;
+  public theme: "light" | "dark" = "light";
   
   constructor(private homeServices:HomeService, private toast:ToastrService )
   {
@@ -17,6 +18,8 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit() {
+    this.toast.success("Vale", 'OK', {timeOut:3000});
+
     // Escucha el evento 'excel-procesado' para recibir mensajes globales
     this.socket.on('excel-procesado', (mensagge: any) => {
         this.toast.success(mensagge,'OK',{timeOut:3000});
@@ -35,6 +38,7 @@ export class AppComponent implements OnInit{
     document.querySelector('body')?.setAttribute("data-bs-theme", "dark");
     document.body.classList.add('dark-mode');
     document.querySelector('#icon')?.setAttribute("class", "fa-solid fa-sun");
+    this.theme = 'dark';
     this.homeServices.setModoOscuro(true);
   }
 
@@ -42,6 +46,7 @@ export class AppComponent implements OnInit{
     document.querySelector('body')?.setAttribute("data-bs-theme", "light");
     document.body.classList.remove('dark-mode');
     document.querySelector('#icon')?.setAttribute("class", "fa-solid fa-moon");
+    this.theme = 'light';
     this.homeServices.setModoOscuro(false);
   }
 
