@@ -1,3 +1,111 @@
-.nav-item {
-    padding: 6px;
+@import url('https://fonts.googleapis.com/css2?family=Koh+Santepheap:wght@300;400;700&family=Roboto:ital,wght@1,300&display=swap');
+
+.header {
+    height: 100vh;
+    width: 11em;
+    background-color: #5650C3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.header__Logo {
+    position: absolute;
+    top: 3em;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.header__Logo h5 {
+    margin: 0;
+    color: white;
+    font-family: 'Koh Santepheap', serif;
+    font-size: 3em;
+    font-weight: 700;
+}
+
+.header__Logo p {
+    margin: 0;
+    color: white;
+}
+
+.header__options {
+    /* background-color: red; */
+
+    height: 20vh;
+    width: 30vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.header__options__icons {
+    /* background-color: black; */
+
+    position: relative;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 20vh;
+    color: white;
+    font-size: 1.8em;
+    font-weight: 200;
+    margin-right: 0.3em;
+}
+
+.header__options__icons i {
+    position: relative;
+}
+
+.active::after {
+    content: "";
+    position: absolute;
+    left: -0.4em;
+    background-color: white;
+    width: 0.15em;
+    height: 1em;
+    border-radius: 18%;
+    animation: mover 0.4s ease-in-out;
+}
+
+.header__options__text {
+    /* background-color: blue; */
+    padding: 7px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 18vh;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+.header__options__text h5 {
+    color: white;
+    font-weight: 200;
+}
+
+@keyframes mover {
+    0% {
+        height: 0;
+    }
+    100% {
+        height: 1em;
+    }
 }

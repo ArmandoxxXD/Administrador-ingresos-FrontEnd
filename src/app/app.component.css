@@ -1,3 +1,11 @@
+
+.web_body {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+}
+
 .button-mode-background-light {
     position: fixed;
     right: 10px;
