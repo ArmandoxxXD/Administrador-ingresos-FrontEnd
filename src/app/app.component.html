@@ -4,5 +4,5 @@
 </div>
 <!--Boton flotante-->
 <div>
-    <button class="button-mode-background" (click)="CambiarTema()"><i id="icon" class="fa-solid fa-moon"></i></button>
+    <button class="btn" [class.button-mode-background-light]="theme === 'light'" [class.button-mode-background-dark]="theme === 'dark'" (click)="CambiarTema()"><i id="icon" class="fa-solid fa-moon"></i></button>
 </div>
