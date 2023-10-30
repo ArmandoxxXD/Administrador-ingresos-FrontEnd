@@ -17,6 +17,9 @@
 
         <div class="home__opciones__seleccionar_fecha">
             <div class="fecha_form">
+                <div *ngIf="miFormulario.hasError('dateRangeInvalid')">
+                    El rango de fechas no es válido.
+                </div>
                 <form [formGroup]="miFormulario">
                     <div class="seleccionar_fecha__body">
                         <div class="seleccionar_fecha__fecha">
@@ -31,12 +34,9 @@
                             <label for="fechaFin">Fecha Fin</label>
                         </div>
                         <div class="seleccionar_fecha__boton">
-                            <button type="button" class="btn btn-outline-success btn-block" id="boton-filtrar"
+                            <button type="button" [class.oscuro]="esModoOscuro" class="btn btn-secondary btn-lg btn-block" id="boton-filtrar"
                                 [disabled]="miFormulario.invalid" (click)="filtrarRegistros()">Filtrar
                             </button>
-                            <div *ngIf="miFormulario.hasError('dateRangeInvalid')">
-                                El rango de fechas no es válido.
-                            </div>
                         </div>
                     </div>
 

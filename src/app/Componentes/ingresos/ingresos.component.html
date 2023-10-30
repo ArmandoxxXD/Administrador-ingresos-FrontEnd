@@ -4,36 +4,29 @@
 
     </div>
     <div class="ingresos__grafica">
-
     </div>
   </div>
 
   <div>
     <div id="container-grafica">
-      <div class="grafica-ingresos" id="chart-container"></div>
+      <div class="grafica-ingresos" id="chart-container-ingresos"></div>
       <button type="button" [class.oscuro]="esModoOscuro" class="btn btn-lg btn-secondary" id="boton-ingresar-reporte"
         (click)="openModal(template1)">Ingresar Reporte</button>
     </div>
     <hr>
   </div>
 
-
-
-
-
-
-
-
-
   <form [formGroup]="miFormulario">
     <div class="container-fluid row text-center">
 
       <div class="col-2">
-        <input type="date" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
+        <input *ngIf="switchDiario" type="date" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
+        <input *ngIf="!switchDiario" type="month" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
         <label for="fechaInicio">Fecha Inicio</label>
       </div>
       <div class="col-2">
-        <input type="date" class="form-control" id="rangoFecha2" formControlName="fechaFin">
+        <input *ngIf="switchDiario" type="date" class="form-control" id="rangoFecha2" formControlName="fechaFin">
+        <input *ngIf="!switchDiario" type="month" class="form-control" id="rangoFecha2" formControlName="fechaFin">
         <label for="fechaFin">Fecha Fin</label>
       </div>
 
@@ -42,7 +35,7 @@
           <div class="d-flex align-items-center justify-content-center h-100">
             <span class="me-2">Mensual</span>
             <div class="form-check form-switch custom-switch-size d-inline-block">
-              <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault"
+              <input class="form-check-input" (click)="swichInput.click()" type="checkbox" role="switch" id="flexSwitchCheckDefault"
                 [(ngModel)]="switchDiario" (change)="onSwitchChange()" #swichInput>
             </div>
             <span class="ms-2">Diario</span>
@@ -126,8 +119,12 @@
       <form [formGroup]="miFormulario2" (ngSubmit)="onSubmit($event,template2)">
         <div class="justify-content-center">
           <div class="input-group mb-3">
-            <div dropZoneFormat class="drop-xlsx" (dropFormat)="onFileDrop($event)" (click)="fileInput.click()">
+            <div dropZoneFormat class="drop-xlsx" (dropFormat)="onFileDrop($event)" *ngIf="selectedFile === undefined" (click)="fileInput.click()">
                 Seleccionar Archivo
+            </div>
+
+            <div class="drop-xlsx-disable" *ngIf="selectedFile != undefined">
+              {{selectedFileName}}
             </div>
 
             <input type="file" class="form-control" id="customFile" accept=".xlsx" formControlName="archivo"
@@ -135,7 +132,7 @@
             
           </div>
           <div class="input-group mb-3">
-            <input type="date" class="form-control" id="customDate" formControlName="fechaRegistro" #fechaInput
+            <input type="month" class="form-control" id="customDate" formControlName="fechaRegistro" #fechaInput
               (change)="validarFecha(fechaInput.value)">
           </div>
         </div>
@@ -227,13 +224,12 @@
 
 
   <!-- Modal 3-->
-
   <ng-template #detalleReporteModal>
     <div class="modal-header">
       <h1 class="modal-title fs-5">Ingresos</h1>
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
     </div>
-    <div class="modal-body" *ngIf="!reporte">
+    <div class="modal-body" *ngIf="reporte">
       <!-- Tabla de Detalles Datos Mensuales -->
       <h2>Datos del Reporte {{reporte[0].fecha | date:'MM/yyyy'}}</h2>
       <table class="table">
