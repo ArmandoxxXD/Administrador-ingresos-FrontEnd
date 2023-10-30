@@ -18,7 +18,6 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.toast.success("Vale", 'OK', {timeOut:3000});
 
     // Escucha el evento 'excel-procesado' para recibir mensajes globales
     this.socket.on('excel-procesado', (mensagge: any) => {
