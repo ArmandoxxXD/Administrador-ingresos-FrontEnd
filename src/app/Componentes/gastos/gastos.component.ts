@@ -57,8 +57,6 @@ export class GastosComponent {
     this.socket = io('http://localhost:2000');
   }
 
-
-
   onFileSelected(event: any) {
     this.selectedFile = event.target.files[0];
     // Actualizar el label del archivo seleccionado
@@ -212,7 +210,25 @@ export class GastosComponent {
       this.gatosService.obtenerReportesPorDias(fechaInicio, fechaFin).subscribe(
         data => {
           this.GastosDiarios = data;
-          console.log(this.GastosDiarios);
+
+          let object = {}
+
+          // Se genera un array para generar la grafica
+          let array: object[] = [];
+
+          // Se genera la grafica con un forEach
+          this.GastosDiarios.forEach((dato: any) => {
+            object = { time: this.filtrarFecha(dato.fecha), value: parseInt(dato.total) }
+            array.push(object);
+          });
+
+          console.log(array)
+          // Se agrega la información para generar la grafica
+          this.lineSeries.setData(array);
+          this.areaSeries.setData(array);
+
+          this.chart.timeScale().fitContent();
+
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
