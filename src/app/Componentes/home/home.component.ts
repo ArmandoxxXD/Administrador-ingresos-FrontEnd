@@ -191,7 +191,7 @@ export class HomeComponent implements OnInit {
   }
 
   filtrarRegistros(){
-    this.homeService.notifyUpdate(true); 
+   this.ngOnInit()
     const fechaInicio = this.miFormulario?.get('fechaInicio')?.value;
     const fechaFin = this.miFormulario.get('fechaFin')?.value;
 
