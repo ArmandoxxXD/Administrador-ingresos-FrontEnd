@@ -107,8 +107,8 @@
       <tbody>
         <!-- Utiliza un *ngFor para iterar sobre los datos diarios -->
         <tr *ngFor="let datoDiario of reporteMensual.Diario.datosDelRangoDias; let i = index">
-          <td>{{ datoDiario[0] }}</td> <!-- El primer elemento del arreglo es la fecha -->
-          <td>{{ reporteMensual.Diario.datosDelRangoTotalDia[i][0] }}</td>
+          <td>{{ datoDiario }}</td> <!-- El primer elemento del arreglo es la fecha -->
+          <td>{{ reporteMensual.Diario.datosDelRangoTotalDia[i] }}</td>
         </tr>
       </tbody>
     </table>
