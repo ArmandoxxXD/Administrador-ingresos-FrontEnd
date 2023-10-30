@@ -69,6 +69,15 @@ export class GastosComponent {
     }
   }
 
+  onFileDrop(file: File) {
+    this.selectedFile = file;
+    if (this.selectedFile) {
+      this.selectedFileName = file.name;
+    } else {
+      this.selectedFileName = undefined;
+    }
+  }
+
   validarFecha(fecha: string) {
     this.gatosService.validarMesAño(fecha).subscribe(
       response => {
@@ -313,6 +322,10 @@ export class GastosComponent {
 
 
   ngOnInit() {
+    this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
+      this.esModoOscuro = modoOscuro;
+    });
+
     // Get the current users primary locale
     const currentLocale = window.navigator.languages[0];
 

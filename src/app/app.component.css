@@ -1,9 +1,23 @@
+.scroll-top {
+    position: fixed;
+    bottom: 5px;
+    right: 2px;
+    font-size: 30px;
+    display: block;
+    width: 50px;
+    height: 50px;
+    color: #fff;
+    background-color: #202225;
+    transition: all 0.5s ease 0s;
+    border: 2px transparent solid;
+    border-radius: 50%;
+    outline: none;
+}
 
-.web_body {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-    width: 100vw;
+.scroll-top:hover {
+    border: 2px #ffc1c1 solid;
+    background-color: #202225;
+    color: #ffc1c1;
 }
 
 .button-mode-background-light {
