@@ -4,7 +4,6 @@
 
     </div>
     <div class="ingresos__grafica">
-
     </div>
   </div>
 
@@ -17,23 +16,17 @@
     <hr>
   </div>
 
-
-
-
-
-
-
-
-
   <form [formGroup]="miFormulario">
     <div class="container-fluid row text-center">
 
       <div class="col-2">
-        <input type="date" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
+        <input *ngIf="switchDiario" type="date" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
+        <input *ngIf="!switchDiario" type="month" class="form-control" id="rangoFecha1" formControlName="fechaInicio">
         <label for="fechaInicio">Fecha Inicio</label>
       </div>
       <div class="col-2">
-        <input type="date" class="form-control" id="rangoFecha2" formControlName="fechaFin">
+        <input *ngIf="switchDiario" type="date" class="form-control" id="rangoFecha2" formControlName="fechaFin">
+        <input *ngIf="!switchDiario" type="month" class="form-control" id="rangoFecha2" formControlName="fechaFin">
         <label for="fechaFin">Fecha Fin</label>
       </div>
 
@@ -139,7 +132,7 @@
             
           </div>
           <div class="input-group mb-3">
-            <input type="date" class="form-control" id="customDate" formControlName="fechaRegistro" #fechaInput
+            <input type="month" class="form-control" id="customDate" formControlName="fechaRegistro" #fechaInput
               (change)="validarFecha(fechaInput.value)">
           </div>
         </div>
@@ -231,13 +224,12 @@
 
 
   <!-- Modal 3-->
-
   <ng-template #detalleReporteModal>
     <div class="modal-header">
       <h1 class="modal-title fs-5">Ingresos</h1>
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
     </div>
-    <div class="modal-body" *ngIf="!reporte">
+    <div class="modal-body" *ngIf="reporte">
       <!-- Tabla de Detalles Datos Mensuales -->
       <h2>Datos del Reporte {{reporte[0].fecha | date:'MM/yyyy'}}</h2>
       <table class="table">

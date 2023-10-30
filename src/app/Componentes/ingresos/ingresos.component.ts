@@ -416,7 +416,7 @@ export class IngresosComponent {
         // Vertical crosshair line (showing Date in Label)
         vertLine: {
           width: 8,
-          color: "#C3BCDB44",
+          color: "#000000",
 
           labelBackgroundColor: "#9B7DFF",
         },
