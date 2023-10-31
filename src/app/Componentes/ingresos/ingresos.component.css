@@ -82,15 +82,9 @@
     padding: 20px;
 }
 
-.custom-table tr:hover {
-    background-color: #f8f9fa;
-}
-
 .consultar-cell {
     cursor: pointer;
     text-align: center;
-    background-color: white;
-    color: black;
     font-weight: 500;
     transition: background-color 0.3s;
 }

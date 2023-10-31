@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, NgZone, TemplateRef, OnInit,OnChanges } from '@angular/core';
+import { Component, ElementRef, ViewChild, TemplateRef} from '@angular/core';
 import { IngresoService } from 'src/app/Servicios/ingreso.service';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -48,7 +48,6 @@ export class IngresosComponent {
     private homeService: HomeService,
     private modalService: BsModalService,
     private fb: FormBuilder,
-    private zone: NgZone,
     private toast: ToastrService
   ) {
     this.miFormulario = this.fb.group({
@@ -89,7 +88,7 @@ export class IngresosComponent {
           this.fechavalid = true;
         } else {
           this.fechavalid = false;
-          window.alert(response.message)
+          this.toast.warning(response.message,'OK',{timeOut:3000});
         }
       },
       error => {
@@ -107,24 +106,18 @@ export class IngresosComponent {
         this.showSpinner = false;
         this.ingresoService.CargarReporteExel(formData).subscribe(
           data => {
-            console.log('Archivo cargado con éxito', data.data);
-            if (this.isSocketAvailable()) {
-              // El servicio Socket.io está disponible, envía el mensaje global
-              this.socket.emit('excel-procesado', data.message);
-            } else {
-              // El servicio Socket.io no está disponible, maneja el mensaje local
-              this.toast.success(data.message,'OK',{timeOut:3000});
-            }
             this.reporteMensual = data.data
             this.fechaMensual = (document.getElementById('customDate') as HTMLInputElement).value;
             this.closeModal()
+            this.miFormulario2?.get('fechaRegistro')?.reset();
             setTimeout(() => {
               this.openModal(template);
             }, 500);
           },
           err => {
             this.closeModal();
-            console.error('Error al cargar el archivo', err);
+            this.toast.error('Error al cargar el archivo','FAIL',{timeOut:3000});
+            this.miFormulario2?.get('fechaRegistro')?.reset();
           }
         );
       }, 2000);
@@ -138,7 +131,6 @@ export class IngresosComponent {
       backdrop: 'static',
       keyboard: false
     });
-    console.log(this.esModoOscuro)
   }
 
 
@@ -172,7 +164,14 @@ export class IngresosComponent {
     console.log(dataMensual, dataDiaria, fecha)
     this.ingresoService.enviarReporte(dataDiaria, dataMensual, fecha).subscribe(
       response => {
-        console.log('Información enviada con éxito', response);
+        console.log(response)
+        if (this.isSocketAvailable()) {
+          // El servicio Socket.io está disponible, envía el mensaje global
+          this.socket.emit('reporte-cargado', response.message);
+        } else {
+          // El servicio Socket.io no está disponible, maneja el mensaje local
+          this.toast.success(response.message,'OK',{timeOut:3000});
+        }
         this.closeModal();
         this.homeService.notifyUpdate(true);
       },
@@ -184,9 +183,9 @@ export class IngresosComponent {
   }
 
   filtrarRegistros() {
+    this.reportes= undefined;
     const fechaInicio = this.miFormulario?.get('fechaInicio')?.value;
     const fechaFin = this.miFormulario.get('fechaFin')?.value;
-
     if (this.switchDiario == false) {
       this.ingresoService.obtenerReportesPorMes(fechaInicio, fechaFin).subscribe(
         data => {
@@ -209,6 +208,7 @@ export class IngresosComponent {
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
+          this.toast.warning('No hay datos disponibles en las fechas seleccionadas','OK',{timeOut:3000});
         }
       );
     } else {
@@ -237,6 +237,7 @@ export class IngresosComponent {
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
+          this.toast.warning('No hay datos disponibles en las fechas seleccionadas','OK',{timeOut:3000});
         }
       );
     }
@@ -263,6 +264,8 @@ export class IngresosComponent {
 
   onSwitchChange() {
     this.switchDiario = !this.switchDiario;
+    this.IngresosDiarios = undefined;
+    this.reportes= undefined;
   }
 
   dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
@@ -305,14 +308,16 @@ export class IngresosComponent {
     }).then((result)=>{
         if(result.value){
           this.ingresoService.eliminarReporteDiarioPorId(id).subscribe(
-            async data => {
+            data => {
               if (this.isSocketAvailable()) {
                 // El servicio Socket.io está disponible, envía el mensaje global
                 this.socket.emit('reporte-eliminado', data);
                 this.homeService.notifyUpdate(true); 
               } else {
-                // El servicio Socket.io no está disponible, maneja el mensaje local
-                this.toast.success(data,'OK',{timeOut:3000});
+                // Formatear la fecha a MM/yyyy
+                const fecha = new Date(data.data.fecha);
+                const formattedDate = `${fecha.getMonth() + 1}/${fecha.getFullYear()}`; // Los meses van de 0 a 11, así que añadimos +1
+                this.toast.success(data.message+' '+formattedDate,'OK',{timeOut:3000});
               }
               this.filtrarRegistros()
             },
@@ -363,7 +368,6 @@ export class IngresosComponent {
   }
 
   ngOnInit(): void {
-
 
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
       this.esModoOscuro = modoOscuro;

@@ -18,7 +18,7 @@ export class HomeComponent implements OnInit {
   hayDatos: boolean = true;
   totalIngreso: number = 0;
   total: number = 0;
-  totalGastos: number = 15600;
+  totalGastos: number = 0;
 
   totalFormato: String = "";
   ingresoFormato: String = "";
@@ -218,5 +218,16 @@ export class HomeComponent implements OnInit {
           console.error('Error obteniendo los reportes:', error);
         });
   } 
+
+reset() {
+  this.totalIngreso = 0;
+  this.totalGastos = 15600;
+  this.total = this.totalIngreso - this.totalGastos;
+  this.hayDatos = true;
+  this.ingresoFormato = this.formatoDinero(this.totalIngreso);
+  this.gastoFormato = this.formatoDinero(this.totalGastos);
+  this.totalFormato = this.formatoDinero(this.total);
+  this.getTotales(); // Llama a la función para obtener los totales
+}
 
 }
