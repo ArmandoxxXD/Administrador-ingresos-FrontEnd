@@ -35,6 +35,11 @@
                         </div>
                         <div class="seleccionar_fecha__boton">
                             <button type="button" [class.oscuro]="esModoOscuro" class="btn btn-secondary btn-lg btn-block" id="boton-filtrar"
+                                (click)="reset()">Reset
+                            </button>
+                            <br>
+                            <br>
+                            <button type="button" [class.oscuro]="esModoOscuro" class="btn btn-secondary btn-lg btn-block" id="boton-filtrar"
                                 [disabled]="miFormulario.invalid" (click)="filtrarRegistros()">Filtrar
                             </button>
                         </div>
