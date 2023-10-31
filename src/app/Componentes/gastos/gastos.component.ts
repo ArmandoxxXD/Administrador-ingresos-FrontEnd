@@ -4,7 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { io, Socket } from 'socket.io-client';
 import { HomeService } from 'src/app/Servicios/home.service';
 import { GastoService } from 'src/app/Servicios/gasto.service';
-
+import Swal from 'sweetalert2';
+import { ToastrService } from 'ngx-toastr';
 import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
 
 @Component({
@@ -44,7 +45,8 @@ export class GastosComponent {
     private gatosService: GastoService,
     private homeService: HomeService,
     private modalService: BsModalService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private toast: ToastrService
   ) {
     this.miFormulario = this.fb.group({
       fechaInicio: [null, Validators.required],
@@ -83,7 +85,7 @@ export class GastosComponent {
           this.fechavalid = true;
         } else {
           this.fechavalid = false;
-          window.alert(response.message)
+          this.toast.warning(response.message,'OK',{timeOut:3000});
         }
       },
       error => {
@@ -102,23 +104,18 @@ export class GastosComponent {
         this.gatosService.CargarReporteExel(formData).subscribe(
           data => {
             console.log('Archivo cargado con éxito', data.data);
-            if (this.isSocketAvailable()) {
-              // El servicio Socket.io está disponible, envía el mensaje global
-              this.socket.emit('excel-procesado', data.message);
-            } else {
-              // El servicio Socket.io no está disponible, maneja el mensaje local
-              window.alert(data.message);
-            }
             this.reporteMensual = data.data
             this.fechaMensual = (document.getElementById('customDate') as HTMLInputElement).value;
             this.closeModal()
+            this.miFormulario2?.get('fechaRegistro')?.reset();
             setTimeout(() => {
               this.openModal(template);
             }, 500);
           },
           err => {
             this.closeModal();
-            console.error('Error al cargar el archivo', err);
+            this.toast.error('Error al cargar el archivo','FAIL',{timeOut:3000});
+            this.miFormulario2?.get('fechaRegistro')?.reset();
           }
         );
       }, 2000);
@@ -165,7 +162,13 @@ export class GastosComponent {
     console.log(dataMensual, dataDiaria, fecha)
     this.gatosService.enviarReporte(dataDiaria, dataMensual, fecha).subscribe(
       response => {
-        console.log('Información enviada con éxito', response);
+        if (this.isSocketAvailable()) {
+          // El servicio Socket.io está disponible, envía el mensaje global
+          this.socket.emit('reporte-cargado', response.message);
+        } else {
+          // El servicio Socket.io no está disponible, maneja el mensaje local
+          this.toast.success(response.message,'OK',{timeOut:3000});
+        }
         this.closeModal();
         this.homeService.notifyUpdate(true);
       },
@@ -177,6 +180,7 @@ export class GastosComponent {
   }
 
   filtrarRegistros() {
+    this.reportes= undefined;
     const fechaInicio = this.miFormulario?.get('fechaInicio')?.value;
     const fechaFin = this.miFormulario.get('fechaFin')?.value;
 
@@ -203,7 +207,8 @@ export class GastosComponent {
 
         },
         error => {
-          console.error('Error obteniendo los reportes:', error);
+          console.error('Error obteniendo los reportes:', error)
+          this.toast.warning('No hay datos disponibles en las fechas seleccionadas','OK',{timeOut:3000});;
         }
       );
     } else {
@@ -232,6 +237,7 @@ export class GastosComponent {
         },
         error => {
           console.error('Error obteniendo los reportes:', error);
+          this.toast.warning('No hay datos disponibles en las fechas seleccionadas','OK',{timeOut:3000});
         }
       );
     }
@@ -255,6 +261,8 @@ export class GastosComponent {
 
   onSwitchChange() {
     this.switchDiario = !this.switchDiario;
+    this.GastosDiarios = undefined;
+    this.reportes= undefined;
   }
 
   dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
@@ -286,23 +294,42 @@ export class GastosComponent {
     )
   }
 
-  eliminarReporteMensual(id: number) {
-    this.gatosService.eliminarReporteDiarioPorId(id).subscribe(
-      async data => {
-        if (this.isSocketAvailable()) {
-          // El servicio Socket.io está disponible, envía el mensaje global
-          this.socket.emit('reporte-eliminado', data);
-          this.homeService.notifyUpdate(true);
-        } else {
-          // El servicio Socket.io no está disponible, maneja el mensaje local
-          window.alert(data);
+  eliminarReporteMensual(id: number){ 
+    Swal.fire({
+      title: '¿Estas Seguro?',
+      text: 'No podras desaser la acción',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancelar'
+    }).then((result)=>{
+        if(result.value){
+          this.gatosService.eliminarReporteDiarioPorId(id).subscribe(
+            data => {
+              if (this.isSocketAvailable()) {
+                // El servicio Socket.io está disponible, envía el mensaje global
+                this.socket.emit('reporte-eliminado', data);
+                this.homeService.notifyUpdate(true); 
+              } else {
+                // Formatear la fecha a MM/yyyy
+                const fecha = new Date(data.data.fecha);
+                const formattedDate = `${fecha.getMonth() + 1}/${fecha.getFullYear()}`; // Los meses van de 0 a 11, así que añadimos +1
+                this.toast.success(data.message+' '+formattedDate,'OK',{timeOut:3000});
+              }
+              this.filtrarRegistros()
+            },
+            error => {
+              console.error('Error obteniendo los reportes:', error);
+            }
+          )
+        }else if(result.dismiss===Swal.DismissReason.cancel){
+          Swal.fire(
+            'Cancelado',
+            'Ingreso no eliminado',
+            'error'
+          )
         }
-        await this.filtrarRegistros()
-      },
-      error => {
-        console.error('Error obteniendo los reportes:', error);
-      }
-    )
+      })
   }
 
   private isSocketAvailable(): boolean {
