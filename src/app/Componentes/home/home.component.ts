@@ -6,6 +6,9 @@ import { IngresoService } from 'src/app/Servicios/ingreso.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import * as echarts from 'echarts';
+import { AuthService } from '@auth0/auth0-angular';
+import { Router } from '@angular/router';
+import { Socket, io } from 'socket.io-client';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +16,7 @@ import * as echarts from 'echarts';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-
+  private socket: Socket;
   esModoOscuro: boolean = false;
   hayDatos: boolean = true;
   totalIngreso: number = 0;
@@ -32,10 +35,12 @@ export class HomeComponent implements OnInit {
   // Variable graficas
   chartDom: any
   myChart: any
-
+  user:any
 
   constructor
     (
+      public auth: AuthService,
+      private router:Router,
       private ingresoService: IngresoService,
       private gastosService: GastoService,
       private homeService: HomeService,
@@ -45,9 +50,25 @@ export class HomeComponent implements OnInit {
       fechaInicio: [null, Validators.required],
       fechaFin: [null, Validators.required],
     }, { validators: this.dateRangeValidator });
+    this.socket = io('http://localhost:2000');
   }
 
   ngOnInit() {
+
+    this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
+      if(!isAuthenticated){
+        this.router.navigate(['/inicio'])
+      }  else {
+        this.auth.user$.subscribe(user => {
+          if (user) {
+            this.user = user.given_name;
+            this.socket.emit('login', this.user);
+            console.log('Usuario enviado:', this.user);
+          }
+        });
+      }
+    })
+
 
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
       this.esModoOscuro = modoOscuro;

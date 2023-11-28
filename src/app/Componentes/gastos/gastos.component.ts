@@ -7,6 +7,8 @@ import { GastoService } from 'src/app/Servicios/gasto.service';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
 import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
+import { AuthService } from '@auth0/auth0-angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gastos',
@@ -35,13 +37,15 @@ export class GastosComponent {
   itemsPerPage = 10;
   fechavalid: boolean = false;
   esModoOscuro: boolean = false;
-
+  user: any;
   // Variables Grafica
   private chart: any; // Declarar la variable para el gráfico
   private lineSeries: any;
   private areaSeries: any;
 
   constructor(
+    public auth: AuthService,
+    private router: Router,
     private gatosService: GastoService,
     private homeService: HomeService,
     private modalService: BsModalService,
@@ -365,6 +369,20 @@ export class GastosComponent {
 
 
   ngOnInit() {
+    this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
+      if(!isAuthenticated){
+        this.router.navigate(['/inicio'])
+      } else {
+        this.auth.user$.subscribe(user => {
+          if (user) {
+            this.user = user.given_name;
+            this.socket.emit('login', this.user);
+            console.log('Usuario enviado:', this.user);
+          }
+        });
+      }
+    })
+
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
       this.esModoOscuro = modoOscuro;
     });
