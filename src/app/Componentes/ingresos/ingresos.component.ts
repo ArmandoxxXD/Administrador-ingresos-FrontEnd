@@ -7,6 +7,8 @@ import { HomeService } from 'src/app/Servicios/home.service';
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
 import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
+import { AuthService } from '@auth0/auth0-angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ingresos',
@@ -35,15 +37,16 @@ export class IngresosComponent {
   currentPage = 1;
   itemsPerPage = 10;
   fechavalid: boolean = false;
-
   // Variables Grafica
   private chart: any; // Declarar la variable para el gráfico
   private lineSeries: any;
   esModoOscuro:boolean = false;
   private areaSeries: any;
-
+  user: any
 
   constructor(
+    public auth: AuthService,
+    private router: Router,
     private ingresoService: IngresoService,
     private homeService: HomeService,
     private modalService: BsModalService,
@@ -146,6 +149,7 @@ export class IngresosComponent {
   }
 
   insertarReporteMensual() {
+
     const fecha = this.fechaMensual
     // Extrae la información diaria y mensual desde el objeto de reporte
     const dataDiaria = {
@@ -368,6 +372,20 @@ export class IngresosComponent {
   }
 
   ngOnInit(): void {
+
+    this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
+      if(!isAuthenticated){
+        this.router.navigate(['/inicio'])
+      } else {
+        this.auth.user$.subscribe(user => {
+          if (user) {
+            this.user = user.given_name;
+            this.socket.emit('login', this.user);
+            console.log('Usuario enviado:', this.user);
+          }
+        });
+      }
+    })
 
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
       this.esModoOscuro = modoOscuro;
