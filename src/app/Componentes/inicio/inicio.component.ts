@@ -23,15 +23,14 @@ export class InicioComponent implements OnInit {
       if(isAuthenticated){
         this.router.navigate(['/inicio'])
         this.isAuth = true;
-
-          this.auth.user$.subscribe(user => {
-            if (user) {
-              this.user = user.given_name;
-              this.socket.emit('login', this.user);
-              console.log('Usuario enviado:', this.user);
-            }
-          });
-
+        this.auth.user$.subscribe(user => {
+          if (user) {
+            this.user = user.given_name;
+            this.socket.emit('login', this.user);
+            console.log('Usuario enviado:', this.user);
+            this.isAuth = true;
+          }
+        });
       } else 
         {
           this.router.navigate(['/inicio'])

@@ -372,7 +372,7 @@ export class IngresosComponent {
   }
 
   ngOnInit(): void {
-
+    
     this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
       if(!isAuthenticated){
         this.router.navigate(['/inicio'])
@@ -384,7 +384,7 @@ export class IngresosComponent {
             console.log('Usuario enviado:', this.user);
           }
         });
-      }
+      } 
     })
 
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {

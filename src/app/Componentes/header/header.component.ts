@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HomeService } from 'src/app/Servicios/home.service';
 import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
 import { AuthService } from '@auth0/auth0-angular';
+import { Socket, io } from 'socket.io-client';
 
 @Component({
   selector: 'app-header',
@@ -11,16 +12,30 @@ import { AuthService } from '@auth0/auth0-angular';
 })
 export class HeaderComponent implements OnInit {
   private path = 'home';
+  private socket: Socket;
   public home = new BehaviorSubject<boolean>(true); // inicialmente falso
   public ingresos = new BehaviorSubject<boolean>(false); // inicialmente falso
   public gastos = new BehaviorSubject<boolean>(false); // inicialmente falso
-
-  constructor(public auth: AuthService,private router: Router, private homeServices: HomeService) { }
+  user: any;
+  isAuth: boolean = false;
+  constructor(public auth: AuthService,private router: Router, private homeServices: HomeService) {
+    this.socket = io('http://localhost:2000');
+   }
 
   ngOnInit(): void {
     this.router.events.subscribe((date: any) => {
       this.setPath();
     })
+
+    this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
+      if(!isAuthenticated){
+        this.router.navigate(['/inicio'])
+      } else {
+        this.isAuth = true;
+      }
+    })
+
+
     
     console.log("observar path")
   }

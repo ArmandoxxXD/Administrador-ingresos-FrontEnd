@@ -58,7 +58,7 @@ export class HomeComponent implements OnInit {
     this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
       if(!isAuthenticated){
         this.router.navigate(['/inicio'])
-      }  else {
+      } else {
         this.auth.user$.subscribe(user => {
           if (user) {
             this.user = user.given_name;

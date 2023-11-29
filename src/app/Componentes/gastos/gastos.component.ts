@@ -369,10 +369,12 @@ export class GastosComponent {
 
 
   ngOnInit() {
+
+    
     this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
       if(!isAuthenticated){
         this.router.navigate(['/inicio'])
-      } else {
+      }  else {
         this.auth.user$.subscribe(user => {
           if (user) {
             this.user = user.given_name;
@@ -381,8 +383,9 @@ export class GastosComponent {
           }
         });
       }
+      
     })
-
+    
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
       this.esModoOscuro = modoOscuro;
     });
