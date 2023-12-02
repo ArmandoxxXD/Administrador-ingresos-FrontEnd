@@ -376,14 +376,6 @@ export class IngresosComponent {
     this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
       if(!isAuthenticated){
         this.router.navigate(['/inicio'])
-      } else {
-        this.auth.user$.subscribe(user => {
-          if (user) {
-            this.user = user.given_name;
-            this.socket.emit('login', this.user);
-            console.log('Usuario enviado:', this.user);
-          }
-        });
       } 
     })
 
