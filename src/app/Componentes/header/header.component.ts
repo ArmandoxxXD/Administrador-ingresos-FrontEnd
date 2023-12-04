@@ -32,12 +32,18 @@ export class HeaderComponent implements OnInit {
         this.router.navigate(['/inicio'])
       } else {
         this.isAuth = true;
+        this.auth.user$.subscribe(user => {
+          if (user) {
+            this.user = user.given_name;
+            this.socket.emit('login', this.user);
+            console.log('Usuario enviado:', this.user);
+          }
+        });
       }
     })
 
 
     
-    console.log("observar path")
   }
 
 
@@ -50,8 +56,8 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    console.log('lasa')
     this.auth.logout();
+    // this.socket.emit('disconnect');
   }
 
 
