@@ -4,6 +4,7 @@ import { HomeService } from 'src/app/Servicios/home.service';
 import { BehaviorSubject, Observable, forkJoin } from 'rxjs';
 import { AuthService } from '@auth0/auth0-angular';
 import { Socket, io } from 'socket.io-client';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-header',
@@ -16,9 +17,13 @@ export class HeaderComponent implements OnInit {
   public home = new BehaviorSubject<boolean>(true); // inicialmente falso
   public ingresos = new BehaviorSubject<boolean>(false); // inicialmente falso
   public gastos = new BehaviorSubject<boolean>(false); // inicialmente falso
-  user: any;
+  user: string | undefined = '';
   isAuth: boolean = false;
-  constructor(public auth: AuthService,private router: Router, private homeServices: HomeService) {
+  constructor(public auth: AuthService,
+    private router: Router,
+    private homeServices: HomeService,
+    private toast: ToastrService,
+    ) {
     this.socket = io('http://localhost:2000');
    }
 
@@ -26,6 +31,22 @@ export class HeaderComponent implements OnInit {
     this.router.events.subscribe((date: any) => {
       this.setPath();
     })
+
+    this.auth.isAuthenticated$.subscribe(isAuthenticated => {
+      if (isAuthenticated) {
+        
+        // Escucha el evento 'excel-procesado' para recibir mensajes globales
+        this.socket.on('reporte-cargado', (mensagge: any) => {
+          this.toast.success(mensagge, 'OK', { timeOut: 3000 });
+        });
+
+        this.socket.on('reporte-eliminado', (mensagge: any) => {
+          this.toast.success(mensagge, 'OK', { timeOut: 3000 });
+        });
+
+      }
+    })
+
 
     this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
       if(!isAuthenticated){

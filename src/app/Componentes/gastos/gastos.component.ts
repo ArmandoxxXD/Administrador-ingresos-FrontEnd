@@ -171,7 +171,7 @@ export class GastosComponent {
       response => {
         if (this.isSocketAvailable()) {
           // El servicio Socket.io está disponible, envía el mensaje global
-          this.socket.emit('reporte-cargado',this.socket.id, this.user, response.message);
+          this.socket.emit('reporte-cargado', this.user, response.message);
         } else {
           // El servicio Socket.io no está disponible, maneja el mensaje local
           this.toast.success(response.message,'OK',{timeOut:3000});
@@ -319,7 +319,7 @@ export class GastosComponent {
 
               if (this.isSocketAvailable()) {
                 // El servicio Socket.io está disponible, envía el mensaje global
-                this.socket.emit('reporte-eliminado',this.socket.id, this.user, data);
+                this.socket.emit('reporte-eliminado', this.user, data);
                 this.homeService.notifyUpdate(true); 
               } else {
                 // Formatear la fecha a MM/yyyy

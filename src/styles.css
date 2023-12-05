@@ -19,7 +19,7 @@
   .dark-mode .swal2-button {
     background-color: #555;
   }
-
+  
   .dark-mode .swal2-confirm {
     background-color: #444; /* Color de fondo del botón en modo oscuro */
     color: #eee; /* Color del texto del botón en modo oscuro */
