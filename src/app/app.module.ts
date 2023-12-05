@@ -16,6 +16,10 @@ import { ToastrModule } from 'ngx-toastr';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { DndFormatDirective } from './directives/dnd-format.directive';
 
+// Import the module from the SDK
+import { AuthModule } from '@auth0/auth0-angular';
+import { InicioComponent } from './Componentes/inicio/inicio.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,7 +27,8 @@ import { DndFormatDirective } from './directives/dnd-format.directive';
     GastosComponent,
     HomeComponent,
     HeaderComponent,
-    DndFormatDirective
+    DndFormatDirective,
+    InicioComponent
   ],
   imports: [
     NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
@@ -36,6 +41,14 @@ import { DndFormatDirective } from './directives/dnd-format.directive';
     BrowserAnimationsModule, // required animations module
     ToastrModule.forRoot(), // ToastrModule added, Alertas de exepciones
     SweetAlert2Module.forRoot(), //Alertas de confirmacion
+    AuthModule.forRoot({
+      domain: 'dev-9dwis1b5.us.auth0.com',
+      clientId: 'ZPC0D1oqk4hw2tEpd6SsQzBPuIvuVf9Q',
+      authorizationParams: {
+        redirect_uri: window.location.origin
+      }
+    }),
+
   ],
   providers: [],
   bootstrap: [AppComponent]
