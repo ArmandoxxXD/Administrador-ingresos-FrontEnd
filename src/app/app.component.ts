@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 })
 export class AppComponent implements OnInit {
   title = 'FrontEnd';
-  private socket: Socket;
+  private socket!: Socket;
   public theme: 'light' | 'dark' = 'light';
   user: any
 
@@ -21,24 +21,27 @@ export class AppComponent implements OnInit {
     public auth: AuthService,
     private router: Router
   ) {
-    this.socket = io('http://localhost:2000');
+    
   }
 
   ngOnInit() {
 
-    // Escucha el evento 'excel-procesado' para recibir mensajes globales
-    this.socket.on('reporte-cargado', (mensagge: any) => {
-      this.toast.success(mensagge, 'OK', { timeOut: 3000 });
-    });
+    this.auth.isAuthenticated$.subscribe(isAuthenticated => {
+      if (isAuthenticated) {
+        this.socket = io('http://localhost:2000');
+        
+        // Escucha el evento 'excel-procesado' para recibir mensajes globales
+        this.socket.on('reporte-cargado', (mensagge: any) => {
+          this.toast.success(mensagge, 'OK', { timeOut: 3000 });
+        });
 
-    this.socket.on('reporte-eliminado', (mensagge: any) => {
-      // Formatear la fecha a MM/yyyy
-      const fecha = new Date(mensagge.data.fecha);
-      const formattedDate = `${fecha.getMonth() + 1}/${fecha.getFullYear()}`; // Los meses van de 0 a 11, así que añadimos +1
-      this.toast.success(mensagge.message + ' ' + formattedDate, 'OK', {
-        timeOut: 3000,
-      });
-    });
+        this.socket.on('reporte-eliminado', (mensagge: any) => {
+          this.toast.success(mensagge, 'OK', { timeOut: 3000 });
+        });
+
+      }
+    })
+
   }
 
   TemaOscuro() {

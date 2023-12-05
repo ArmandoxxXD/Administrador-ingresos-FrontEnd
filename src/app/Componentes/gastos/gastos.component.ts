@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { createChart, LineStyle, CrosshairMode } from 'lightweight-charts';
 import { AuthService } from '@auth0/auth0-angular';
 import { Router } from '@angular/router';
+import { RegistroActividadService } from 'src/app/Servicios/registro-actividad.service';
 
 @Component({
   selector: 'app-gastos',
@@ -38,6 +39,7 @@ export class GastosComponent {
   fechavalid: boolean = false;
   esModoOscuro: boolean = false;
   user: any;
+  gmail:any;
   // Variables Grafica
   private chart: any; // Declarar la variable para el gráfico
   private lineSeries: any;
@@ -48,6 +50,7 @@ export class GastosComponent {
     private router: Router,
     private gatosService: GastoService,
     private homeService: HomeService,
+    private logsService: RegistroActividadService,
     private modalService: BsModalService,
     private fb: FormBuilder,
     private toast: ToastrService
@@ -168,11 +171,12 @@ export class GastosComponent {
       response => {
         if (this.isSocketAvailable()) {
           // El servicio Socket.io está disponible, envía el mensaje global
-          this.socket.emit('reporte-cargado', response.message);
+          this.socket.emit('reporte-cargado',this.socket.id, this.user, response.message);
         } else {
           // El servicio Socket.io no está disponible, maneja el mensaje local
           this.toast.success(response.message,'OK',{timeOut:3000});
         }
+        this.logsService.guardarActividad(this.user,this.gmail,response.message).subscribe()
         this.closeModal();
         this.homeService.notifyUpdate(true);
       },
@@ -310,16 +314,18 @@ export class GastosComponent {
         if(result.value){
           this.gatosService.eliminarReporteDiarioPorId(id).subscribe(
             data => {
+              const fecha = new Date(data.data.fecha);
+              const formattedDate = `${fecha.getMonth() + 1}/${fecha.getFullYear()}`; // Los meses van de 0 a 11, así que añadimos +1
+
               if (this.isSocketAvailable()) {
                 // El servicio Socket.io está disponible, envía el mensaje global
-                this.socket.emit('reporte-eliminado', data);
+                this.socket.emit('reporte-eliminado',this.socket.id, this.user, data);
                 this.homeService.notifyUpdate(true); 
               } else {
                 // Formatear la fecha a MM/yyyy
-                const fecha = new Date(data.data.fecha);
-                const formattedDate = `${fecha.getMonth() + 1}/${fecha.getFullYear()}`; // Los meses van de 0 a 11, así que añadimos +1
                 this.toast.success(data.message+' '+formattedDate,'OK',{timeOut:3000});
               }
+              this.logsService.guardarActividad(this.user,this.gmail,data.message+' '+formattedDate).subscribe()
               this.filtrarRegistros()
             },
             error => {
@@ -369,6 +375,8 @@ export class GastosComponent {
 
 
   ngOnInit() {
+
+    
     this.auth.isAuthenticated$.subscribe(isAuthenticated =>{
       if(!isAuthenticated){
         this.router.navigate(['/inicio'])
@@ -376,13 +384,13 @@ export class GastosComponent {
         this.auth.user$.subscribe(user => {
           if (user) {
             this.user = user.given_name;
-            this.socket.emit('login', this.user);
-            console.log('Usuario enviado:', this.user);
+            this.gmail = user.email
           }
         });
-      }
+      } 
+      
     })
-
+    
     this.homeService.esModoOscuro$.subscribe((modoOscuro) => {
       this.esModoOscuro = modoOscuro;
     });
